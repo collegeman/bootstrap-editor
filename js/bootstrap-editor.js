@@ -18,7 +18,9 @@
       
       this.options.type = ( this.$el.data('edit-with') || defaultEditorType ).toLowerCase();
       this.options.fullscreen = this.$el.data('fullscreen') !== undefined ? this.$el.data('fullscreen') : true;
-
+      this.options.width = this.$el.data('width') || this.$el.parent().width();
+      this.options.height = this.$el.data('height') || '100';
+      
       this.$el.addClass('bootstrap-editor bootstrap-editor-' + this.options.type);
       this.$el.addClass(this.classId = 'bootstrap-editor-' + (Editor.elIdx++));
       this['init_' + this.options.type](options);
@@ -34,8 +36,6 @@
 
     init_tinymce: function() {
       this.options.css = this.$el.data('tinymce-css') || '/css/tinymce-content.css';
-      this.options.width = this.$el.data('tinymce-width') || this.$el.parent().width();
-      this.options.height = this.$el.data('tinymce-height') || '100';
       this.options.tools = this.$el.data('tinymce-tools') || false;
       this.options.status = this.$el.data('tinymce-status') || false;
       
@@ -55,6 +55,8 @@
         theme_advanced_buttons1: '',
         plugins : 'fullscreen,autoresize',
         fullscreen_new_window: false,
+        autoresize_bottom_margin: 20, // TODO: make this configurable
+        autoresize_min_height: this.options.height,
         fullscreen_settings: {
           theme_advanced_buttons1: ''
         },
@@ -66,6 +68,27 @@
           that.tinymce = tinyMCE.get($el.attr('id'));
           that.tinymce.$el = $('#' + that.tinymce.editorContainer).css({ position: 'relative', display: 'inline-block' });
           that.tinymce.$el.addClass('bootstrap-mce-editor');
+
+          that.$tools = $('<div class="tools"><a class="tool-btn" href="#"><i class="icon-font"></i></a></div>');
+
+          that.tinymce.$el.append(that.$tools);
+
+          /*
+          var uploader = new plupload.Uploader({
+            runtimes : 'gears,html5,flash,silverlight,browserplus',
+            // browse_button : 'pickfiles',
+            // container : 'container',
+            max_file_size : '10mb',
+            url : 'upload.php',
+            flash_swf_url : '/plupload/js/plupload.flash.swf',
+            silverlight_xap_url : '/plupload/js/plupload.silverlight.xap',
+            filters : [
+              {title : "Image files", extensions : "jpg,gif,png"}
+              // , {title : "Zip files", extensions : "zip"}
+            ],
+            resize : {width : 320, height : 240, quality : 90}
+          });
+          */
 
           // placeholder
           if ($el.attr('placeholder')) {
@@ -112,6 +135,12 @@
             });
             that.tinymce.$el.append($fullscreen);
             $fullscreen.click(function() {
+              if ($el.attr('placeholder')) {
+                if ($(that.tinymce.getContent()).text().trim() === $el.attr("placeholder")) {
+                  that.tinymce.setContent('');
+                }
+              }
+
               that.tinymce.execCommand('mceFullScreen');
 
               // setup ESC key to exit
