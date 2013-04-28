@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Editor, for Bootstrap</title>
+    <title>Bootstrap-Editor: A collection of easy-to-configure content editors for Bootstrap.</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -15,6 +15,7 @@
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
+    <link href="/css/font-awesome.css" rel="stylesheet"> 
     <link href="/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/css/bootstrap-editor.css" rel="stylesheet">
     <link href="/css/docs.css" rel="stylesheet">
@@ -44,7 +45,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Editor</a>
+          <a class="brand" href="#">Bootstrap-Editor</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li><a href="http://github.com/collegeman/bootstrap-editor">Github Project</a></li>
@@ -57,7 +58,7 @@
 
     <header class="jumbotron subhead" id="overview">
       <div class="container">
-        <h1>Editor</h1>
+        <h1>Bootstrap-Editor</h1>
         <p class="lead">A collection of easy-to-configure content editors for Bootstrap.</p>
       </div>
     </header>
@@ -66,35 +67,101 @@
 
       <div class="row">
         <div class="span3 bs-docs-sidebar">
-          <ul class="nav nav-list bs-docs-sidenav">
+          <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="200">
             <li><a href="#about"><i class="icon-chevron-right"></i> About</a></li>
             <li><a href="#download"><i class="icon-chevron-right"></i> Download</a></li>
-            <li><a href="#installation"><i class="icon-chevron-right"></i> Configure</a></li>
-            <li><a href="#tinyce"><i class="icon-chevron-right"></i> TinyMCE</a></li>
-            <li><a href="#markdown"><i class="icon-chevron-right"></i> Markdown</a></li>
-            <li><a href="#ace"><i class="icon-chevron-right"></i> ACE</a></li>
+            <li><a href="#configure"><i class="icon-chevron-right"></i> Configure</a></li>
+            <li><a href="#wysiwyg"><i class="icon-chevron-right"></i> WYSIWYG Editor</a></li>
+            <li><a href="#markdown"><i class="icon-chevron-right"></i> Markdown Editor</a></li>
+            <li><a href="#code"><i class="icon-chevron-right"></i> Code Editor</a></li>
           </ul>
         </div>
+
         <div class="span9">
 
-          <section id="tinymce">
+          <section id="about"></section>
+
+          <section id="download"></section>
+
+          <section id="configure"></section>
+
+          <section id="wysiwyg">
             <div class="page-header">
-              <h1>TinyMCE</h1>
+              <h1>WYSIWYG Editor</h1>
             </div>
 
-            <h2>Simplest</h2>
-            <p>Transform a <code>&lt;textarea&gt;</code> input into a TinyMCE editor with fullscreen edit mode.</p>
+            <h2>TinyMCE</h2>
+            <p>Transform a <code>&lt;textarea&gt;</code> input into a <a href="http://www.tinymce.com/" target="_blank">TinyMCE</a> editor with formatting tools,
+              drag-and-drop uploading, and distraction-free mode.</p>
           
             <div class="bs-docs-example">
-              <textarea data-edit-with="tinymce" placeholder="This is where you type"></textarea>
+              <textarea data-edit-with="wysiwyg" placeholder="This is where you write and style"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea data-edit-with="tinymce" placeholder="This is where you type"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea data-edit-with="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
+            
+            <hr class="bs-docs-separator">
+
+            <h2>Usage</h2>
+            <p>Just select an <code>&lt;textarea&gt;</code> using <code>jQuery</code> and call</p>
+            <pre class="prettyprint linenums">$('textarea').editor('wysiwyg');</pre>
+
+            <h3>Markup</h3>
+            <p>You will use data attributes to configure your TinyMCE editor. When the DOM is ready, any <code>&lt;textarea&gt;</code>
+              having <code>data-edit-with="wysiwyg"</code> will automatically become a TinyMCE editor.</p>
+
+            <h3>Methods</h3>
+
+            <h4>$().val()</h4>
+            <p>Use the familiar <code>val()</code> function to read and write from the editor.</p>
+            <pre class="prettyprint linenums">&lt;textarea data-edit-with="wysiwyg" placeholder="foo"&gt;&lt;textarea&gt;
+&lt;script&gt;
+  $('textarea').val(); // == &lt;p&gt;foo&lt;p&gt;
+  $('textarea').val('&lt;b&gt;bar!&lt;/b&gt;'); // HTML editor updated!
+&lt;/script&gt;</pre>
+
+            <h4>$().editor('exec', cmd)</h4>
+            <p>This will invoke <code>TinyMCE.execCommand(cmd)</code> and so provides you with direct access
+              to the <a href="http://www.tinymce.com/wiki.php/Command_identifiers" target="_blank">TinyMCE API</a>.</p>
+            <pre class="prettyprint linenums">$('textarea').editor('exec', 'bold'); // current selection will toggled bold</pre>
+            <p>Our proxy method accepts all of the parameters accepted by <code>TinyMCE.execCommand()</code>:</p>
+            <pre class="prettyprint linenums">$('textarea').editor('exec', cmd, ui, val);</pre>
+
           </seection>
+          
+          <hr class="bs-docs-separator">
+      
+          <section id="markdown">
+            <div class="page-header">
+              <h1>Markdown Editor</h1>
+            </div>
+
+            <h2>PageDown</h2>
+            <p>Transform a <code>&lt;textarea&gt;</code> input into a Markdown editor with <a href="https://code.google.com/p/pagedown/">preview</a>, drag-and-drop uploading, and distraction-free mode.</p>
+            
+            <div class="bs-docs-example">
+              <textarea data-edit-with="markdown" placeholder="This is where you write; forget style!"></textarea>
+            </div>
+
+            <pre class="prettyprint linenums">&lt;textarea data-edit-with="markdown" placeholder="This is where you write; forget style!"&gt;&lt;textarea&gt;</pre>
+          </section>
 
           <hr class="bs-docs-separator">
 
-    
+          <section id="code">
+            <div class="page-header">
+              <h1>Code Editor</h1>
+            </div>
+
+            <h2>ACE</h2>
+            <p>Transform a <code>&lt;textarea&gt;</code> input into an <a href="http://ajaxorg.github.io/ace/#nav=about">ACE</a> code editor.</p> 
+            <div class="bs-docs-example">
+              <textarea data-edit-with="source"></textarea>
+            </div>
+
+            <pre class="prettyprint linenums">&lt;textarea data-edit-with="source"&gt;&lt;textarea&gt;</pre>
+          </section>
+
         </div><!-- /.span9 -->
       </div>
     </div> <!-- /container -->
@@ -108,6 +175,7 @@
     <script src="/js/prettify.js"></script>
     <script>
       window.prettyPrint && prettyPrint();
+      // This isn't working: $('.bs-docs-sidenav').scrollspy();
     </script>
   </body>
 </html>

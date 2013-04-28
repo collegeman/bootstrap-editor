@@ -1,11 +1,13 @@
 !function($, ns) {
 
+  var $window = $(window);
+
   window.console = window.console || { log: function() {}, error: function() {} };
 
-  var defaultEditorType = 'tinymce';
+  var defaultEditorType = 'wysiwyg';
 
   var Editor = function($el, options) {
-    this.$el = $el.hide();
+    this.$el = $el;
     this.init(options);
   };
 
@@ -16,25 +18,47 @@
     init: function(options) {
       this.options = options || {};
       
-      this.options.type = ( this.$el.data('edit-with') || defaultEditorType ).toLowerCase();
+      this.options.type = ( this.options.type || this.$el.data('edit-with') || defaultEditorType ).toLowerCase();
       this.options.fullscreen = this.$el.data('fullscreen') !== undefined ? this.$el.data('fullscreen') : true;
       this.options.width = this.$el.data('width') || this.$el.parent().width();
       this.options.height = this.$el.data('height') || '100';
+      this.options.maxHeight = this.$el.data('max-height') || $window.height() * 0.60;
       
       this.$el.addClass('bootstrap-editor bootstrap-editor-' + this.options.type);
       this.$el.addClass(this.classId = 'bootstrap-editor-' + (Editor.elIdx++));
       this['init_' + this.options.type](options);
     },
 
-    exec: function(cmd, ui, val, a) {
-      if (this.options.type !== 'tinymce') {
-        console.error('Editor is not type tinyMCE');
-        return false;
-      }
-      this.tinymce.execCommand(cmd, ui, val, a);
+    init_markdown: function() {
+
     },
 
-    init_tinymce: function() {
+    init_source: function() {
+
+    },
+
+    init_wysiwyg: function() {
+
+      this.exec = function(cmd, ui, val, a) {
+        this.tinymce.execCommand(cmd, ui, val, a);
+      };
+
+      this.val = function(val) {
+        if (val !== undefined) {
+          this.tinymce.setContent(val);
+          return this;
+        } else {
+          val = this.tinymce.getContent();
+          if (this.$el.attr('placeholder') && $(val).text().trim() === this.$el.attr('placeholder')) {
+            return '';
+          } else {
+            return val;
+          }
+        }
+      };
+
+      this.$el.hide();
+
       this.options.css = this.$el.data('tinymce-css') || '/css/tinymce-content.css';
       this.options.tools = this.$el.data('tinymce-tools') || false;
       this.options.status = this.$el.data('tinymce-status') || false;
@@ -57,6 +81,7 @@
         fullscreen_new_window: false,
         autoresize_bottom_margin: 20, // TODO: make this configurable
         autoresize_min_height: this.options.height,
+        autoresize_max_height: this.options.maxHeight,
         fullscreen_settings: {
           theme_advanced_buttons1: ''
         },
@@ -69,7 +94,81 @@
           that.tinymce.$el = $('#' + that.tinymce.editorContainer).css({ position: 'relative', display: 'inline-block' });
           that.tinymce.$el.addClass('bootstrap-mce-editor');
 
-          that.$tools = $('<div class="tools"><a class="tool-btn" href="#"><i class="icon-font"></i></a></div>');
+          // setup formatters
+          that.tinymce.formatter.register('fontSizeHuge', {
+            inline: 'span',
+            styles: { 'fontSize': 'xx-large' }
+          });
+
+          // build-out UI
+          that.$tools = $('<div class="tools"></div>');
+          that.$tools.append(that.$btnFormatTools = $('<a class="tool-btn" href="#"><i class="icon-font"></i></a>'));
+          that.$tools.append('<span class="tool-separator"></span>');
+          that.$tools.append(that.$btnUpload = $('<a class="tool-btn" href="#"><i class="icon-paper-clip"></i></a>'));
+          that.$tools.append(that.$formatTools = $('<div class="format-tools"><span class="arrow"></span></div>'));
+          that.$formatTools.append(that.$btnFontFace = $('<a class="tool-btn" href="#"><label>Sans Serif</label><i class="icon-caret-down"></i><div class="select"></div></a>'));
+          that.$formatTools.append('<span class="tool-separator"></span>');
+          that.$formatTools.append(that.$btnFontSize = $('<a class="tool-btn" href="#"><i class="icon-text-height"></i><i class="icon-caret-down"></i><div class="select"></div></a>'));
+          that.$btnFontSize.append(that.$btnFontSizeSelect = $('<div class="select"></div>'));
+          that.$btnFontSizeSelect.append('<a class="font-size font-size-small" href="#">Small</a>');
+          that.$btnFontSizeSelect.append('<a class="font-size font-size-normal" href="#">Normal</a>');
+          that.$btnFontSizeSelect.append('<a class="font-size font-size-large" href="#">Large</a>');
+          that.$btnFontSizeSelect.append('<a class="font-size font-size-huge" data-formatter="fontSize" data-formatter-value="Huge" href="#">Huge</a>');
+          that.$formatTools.append('<span class="tool-separator"></span>');
+          that.$formatTools.append(that.$btnBold = $('<a class="tool-btn" href="#" data-command="bold"><i class="icon-bold"></i></a>'));
+          that.$formatTools.append(that.$btnItalic = $('<a class="tool-btn" href="#" data-command="italic"><i class="icon-italic"></i></a>'));
+          that.$formatTools.append(that.$btnUnderline = $('<a class="tool-btn" href="#" data-command="underline"><i class="icon-underline"></i></a>'));
+          that.$formatTools.append(that.$btnColor = $('<a class="tool-btn" href="#"><i class="icon-font icon-colors"></i><i class="icon-caret-down"></i><div class="select"></div></a>'));
+          that.$formatTools.append('<span class="tool-separator"></span>');
+          that.$formatTools.append(that.$btnOlist = $('<a class="tool-btn" href="#" data-command="insertorderedlist"><i class="icon-list-ol"></i></a>'));
+          that.$formatTools.append(that.$btnUlist = $('<a class="tool-btn" href="#" data-command="insertunorderedlist"><i class="icon-list-ul"></i></a>'));
+          that.$formatTools.append(that.$btnAlign = $('<a class="tool-btn" href="#"><i class="icon-align-left"></i><i class="icon-caret-down"></i></a>'));
+          that.$btnAlign.append(that.$btnAlignSelect = $('<div class="select"></div>'));
+          that.$btnAlignSelect.append(that.$btnAlignLeft = $('<a class="tool-btn" href="#" data-command="justifyleft"><i class="icon-align-left"></i></a>') );
+          that.$btnAlignSelect.append(that.$btnAlignCenter = $('<a class="tool-btn" href="#" data-command="justifycenter"><i class="icon-align-center"></i></a>') );
+          that.$btnAlignSelect.append(that.$btnAlignRight = $('<a class="tool-btn" href="#" data-command="justifyright"><i class="icon-align-right"></i></a>') );
+          that.$btnAlignSelect.append('<br>');
+          that.$btnAlignSelect.append(that.$btnOutdent = $('<a class="tool-btn" href="#" data-command="outdent"><i class="icon-indent-left"></i></a>') );
+          that.$btnAlignSelect.append(that.$btnIndent = $('<a class="tool-btn" href="#" data-command="indent"><i class="icon-indent-right"></i></a>') );
+          that.$btnAlignSelect.append(that.$btnQuote = $('<a class="tool-btn" href="#" data-command="formatblock" data-command-value="blockquote"><i class="icon-quote-left"></i></a>') );
+          that.$formatTools.append('<span class="tool-separator"></span>');
+          that.$formatTools.append(that.$btnRemove = $('<a class="tool-btn" href="#" data-command="removeformat"><i class="icon-remove"></i></a>'));
+          
+          that.$tools.find('a[data-command]').click(function() {
+            var $this = $(this);
+            that.tinymce.execCommand($this.data('command'), true, $this.data('command-value'));
+            $this.parent('.select').parent('.tool-btn').removeClass('active');
+            return false;
+          });
+
+          that.$tools.find('a.tool-btn:has(> .select)').click(function() {
+            $(this).toggleClass('active');
+            return false;
+          });
+
+          that.$tools.find('a[data-formatter="fontSize"]').click(function() {
+            var size = $(this).data('data-formatter-value');
+            that.tinymce.formatter.toggle('fontSize' + size);
+            return false;
+          });
+
+          that.$btnFormatTools.click(function() {
+            that.tinymce.focus();
+            that.tinymce.$el
+            that.$btnFormatTools.toggleClass('active');
+            that.$formatTools[that.$btnFormatTools.hasClass('active') ? 'show' : 'hide']();
+            that.$tools.toggleClass('format-open', that.$btnFormatTools.hasClass('active'));
+            return false;
+          });
+
+          var hideAllSelectContainers = function() {
+            that.$tools.find('.select:visible').each(function() {
+              $(this).parent('.tool-btn').removeClass('active');
+            });
+          };
+
+          $(document).on('click', hideAllSelectContainers);
+          $el.bind('tinymce-focus', hideAllSelectContainers);
 
           that.tinymce.$el.append(that.$tools);
 
@@ -93,18 +192,36 @@
           // placeholder
           if ($el.attr('placeholder')) {
             if (!that.tinymce.getContent().length) {
-              that.tinymce.setContent('<span class="placeheld">' + $el.attr("placeholder") + '</span>');
+              that.tinymce.setContent($el.attr("placeholder"));
+              $(that.tinymce.getDoc()).find('body').addClass('placeheld');
             }
             that.tinymce.onKeyDown.add(function(ed, e) {
               if ($(that.tinymce.getContent()).text().trim() === $el.attr("placeholder")) {
                 that.tinymce.setContent('');
+                $(that.tinymce.getDoc()).find('body').removeClass('placeheld');
               }
             });
+            $el.bind('tinymce-focus', function() {
+              if ($(that.tinymce.getContent()).text().trim() === $el.attr("placeholder")) {
+                that.tinymce.setContent('');
+              }
+              $(that.tinymce.getDoc()).find('body').removeClass('placeheld');
+            });
             $el.bind('tinymce-blur', function() {
-              if (!that.tinymce.getContent().length) {
-                that.tinymce.setContent('<span class="placeheld">' + $el.attr("placeholder") + '</span>');
+              /*
+              For now just leave placeholder gone...
+              Consider moving placeholder to an absolutely positioned element, instead of within content...
+              if (!$(that.tinymce.getContent()).text().trim().length) {
+                that.tinymce.setContent($el.attr("placeholder"));
+                $(that.tinymce.getDoc()).find('body').addClass('placeheld');
                 // updating content restores focus, so we have to remove the class here...
                 that.tinymce.$el.removeClass('has-focus');
+              }
+              */
+            });
+            that.tinymce.onExecCommand.add(function(ed, cmd) {
+              if (cmd === 'mceFullScreen') {
+                $(that.tinymce.getDoc()).find('body').toggleClass('placeheld', that.tinymce.getContent() === $el.attr('placeholder'));
               }
             });
           }
@@ -128,7 +245,7 @@
 
           // add standard full screen button?
           if (that.options.fullscreen) {
-            var $fullscreen = $('<a href="#"><span class="icon-fullscreen"></span></a>').css({ 
+            var $fullscreen = $('<a href="#"><span class="fullscreen"></span></a>').css({ 
               position: 'absolute', 
               top: '5px', 
               right: '5px' 
@@ -148,12 +265,12 @@
                 if (e.keyCode == 27) { 
                   // Don't use that.tinymce here, it doesn't work
                   tinyMCE.execCommand('mceFullScreen');
-                  $(window).unbind('keyup', exit);
+                  $window.unbind('keyup', exit);
                   return false;
                 }
               };
 
-              $(window).on('keyup', exit);
+              $window.on('keyup', exit);
               return false;
             });
           }
@@ -191,5 +308,24 @@
   $('[data-edit-with]').each(function() {
     $(this)[ns]();
   });
+
+  $.valHooks['textarea'] = {
+    set: function(el, val) {
+      var $el = $(el);
+      if ($el.data(ns)) {
+        $el.data(ns).val(val);
+      } else {
+        el.value = val;
+      }
+    },
+    get: function(el) {
+      var $el = $(el);
+      if ($el.data(ns)) {
+        return $el.data(ns).val();
+      } else {
+        return el.value;
+      }
+    }
+  };
 
 }(jQuery, 'editor');
