@@ -3,9 +3,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap-Editor: A collection of easy-to-configure content editors for Bootstrap.</title>
+    <title>Bootstrap-Editor: A collection of easy-to-setup content editors for Bootstrap.</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Bootstrap-Editor: A collection of easy-to-configure content editors for Bootstrap.">
+    <meta name="description" content="Bootstrap-Editor: A collection of easy-to-setup content editors for Bootstrap.">
     <meta name="author" content="">
 
     <!-- Le styles -->
@@ -51,7 +51,7 @@
     <header class="jumbotron subhead" id="overview">
       <div class="container">
         <h1>Bootstrap-Editor</h1>
-        <p class="lead">A collection of easy-to-configure content editors for Bootstrap.</p>
+        <p class="lead">A collection of easy-to-setup content editors for Bootstrap.</p>
       </div>
     </header>
 
@@ -62,7 +62,7 @@
           <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="200">
             <li><a href="#about"><i class="icon-chevron-right"></i> About</a></li>
             <li><a href="#files"><i class="icon-chevron-right"></i> Download</a></li>
-            <li><a href="#configure"><i class="icon-chevron-right"></i> Setup</a></li>
+            <li><a href="#setup"><i class="icon-chevron-right"></i> Setup</a></li>
             <li><a href="#wysiwyg"><i class="icon-chevron-right"></i> WYSIWYG Editor</a></li>
             <li><a href="#markdown"><i class="icon-chevron-right"></i> Markdown Editor</a></li>
             <li><a href="#code"><i class="icon-chevron-right"></i> Code Editor</a></li>
@@ -83,7 +83,38 @@
               <a href="#markdown">Markdown</a>, and <a href="#code">source code</a>.</p>
             <section id="files">
               <h2>Download</h2>
-              <p>You can <a href="https://github.com/collegeman/bootstrap-editor/archive/master.zip">download the latest</a> from GitHub.</p>
+              <p>You should <a href="https://github.com/collegeman/bootstrap-editor/archive/master.zip">download the latest</a> from GitHub.
+                In the archive you will find the following:</p>
+              <table class="table">
+                <tr>
+                  <th>./css</th>
+                  <td>Stylesheets for all editors, as well as for <a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a></td>
+                </tr>
+                <tr>
+                  <th>./dist</th>
+                  <td>All the files you will need to use bootstrap-editor in production</td>
+                </tr>
+                <tr>
+                  <th>./docs</th>
+                  <td>A copy of these docs</td>
+                </tr>
+                <tr>
+                  <th>./font</th>
+                  <td>The font files for <a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a></td>
+                </tr>
+                <tr>
+                  <th>./js</th>
+                  <td>The JavaScript libraries</td>
+                </tr>
+                <tr>
+                  <th>./build-docs.sh</th>
+                  <td>A bash script for building and publishing this documentation</td>
+                </tr>
+                <tr>
+                  <th>./build.sh</th>
+                  <td>A bash script for assembling the contents of the ./dist folder</td>
+                </tr>
+              </table>
             </section>
             <section id="setup">
               <h2>Setup</h2>
@@ -141,6 +172,10 @@
               <h1>Markdown Editor</h1>
             </div>
 
+            <div class="alert alert-error">
+              <b>Note:</b> This is editor is incomplete.
+            </div>
+
             <h2>PageDown</h2>
             <p>Transform a <code>&lt;textarea&gt;</code> input into a Markdown editor with <a href="https://code.google.com/p/pagedown/">preview</a>, drag-and-drop uploading, and distraction-free mode.</p>
             
@@ -158,6 +193,10 @@
               <h1>Code Editor</h1>
             </div>
 
+            <div class="alert alert-error">
+              <b>Note:</b> This is editor is incomplete.
+            </div>
+
             <h2>ACE</h2>
             <p>Transform a <code>&lt;textarea&gt;</code> input into an <a href="http://ajaxorg.github.io/ace/#nav=about">ACE</a> code editor.</p> 
             <div class="bs-docs-example">
@@ -171,6 +210,20 @@
       </div>
     </div> <!-- /container -->
 
+    <footer class="footer">
+      <div class="container">
+        <p>The talents and gifts of many, combined by <a href="http://aaroncollegeman.com" target="_blank">@collegeman</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">MIT License</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+        <ul class="footer-links">
+          <li><a href="http://fatpandadev.com">Fat Panda</a></li>
+          <li class="muted">·</li>
+          <li><a href="https://github.com/collegeman/bootstrap-editor/issues?state=open">Issues</a></li>
+          <li class="muted">·</li>
+          <li><a href="https://github.com/collegeman/bootstrap-editor/blob/master/CHANGELOG.md">Changelog</a></li>
+        </ul>
+      </div>
+    </footer>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>!window.jQuery && document.write(unescape('%3Cscript src="js/jquery.js"%3E%3C/script%3E'))</script>
     <script src="js/bootstrap.js"></script>
@@ -182,7 +235,7 @@
       window.prettyPrint && prettyPrint();
       setTimeout(function() {
         $('.bs-docs-sidenav').scrollspy();
-      }, 100);
+      }, 200);
     </script>
   </body>
 </html>
