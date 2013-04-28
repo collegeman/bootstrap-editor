@@ -5,34 +5,26 @@
     <meta charset="utf-8">
     <title>Bootstrap-Editor: A collection of easy-to-configure content editors for Bootstrap.</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
+    <meta name="description" content="Bootstrap-Editor: A collection of easy-to-configure content editors for Bootstrap.">
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
-    <link href="/css/font-awesome.css" rel="stylesheet"> 
-    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/css/bootstrap-editor.css" rel="stylesheet">
-    <link href="/css/docs.css" rel="stylesheet">
-    <link href="/css/prettify.css" rel="stylesheet">
+    <link href="css/font-awesome.css" rel="stylesheet"> 
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/bootstrap-editor.css" rel="stylesheet">
+    <link href="css/docs.css" rel="stylesheet">
+    <link href="css/prettify.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="../assets/js/html5shiv.js"></script>
+      <script src="js/html5shiv.js"></script>
     <![endif]-->
-
-    <!-- Fav and touch icons
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-    <link rel="shortcut icon" href="../assets/ico/favicon.png">
-     -->
   </head>
 
   <body>
@@ -70,7 +62,7 @@
           <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="200">
             <li><a href="#about"><i class="icon-chevron-right"></i> About</a></li>
             <li><a href="#download"><i class="icon-chevron-right"></i> Download</a></li>
-            <li><a href="#configure"><i class="icon-chevron-right"></i> Configure</a></li>
+            <li><a href="#configure"><i class="icon-chevron-right"></i> Setup</a></li>
             <li><a href="#wysiwyg"><i class="icon-chevron-right"></i> WYSIWYG Editor</a></li>
             <li><a href="#markdown"><i class="icon-chevron-right"></i> Markdown Editor</a></li>
             <li><a href="#code"><i class="icon-chevron-right"></i> Code Editor</a></li>
@@ -79,11 +71,31 @@
 
         <div class="span9">
 
-          <section id="about"></section>
+          <section id="about">
+            <div class="page-header">
+              <h1>About</h1>
+            </div>
+            <p>Many of the projects we work on at <a href="http://fatpandadev.com">Fat Panda</a> involve
+              enabling users to edit and publish content. We love Bootstrap for rapid prototyping, and
+              felt that this ecosystem could benefit from the addition of drop-in content editors, as
+              easy to get running as adding a single <code>&lt;textarea&gt;</code> to your markup.</p>
+            <p>
 
-          <section id="download"></section>
+          </section>
 
-          <section id="configure"></section>
+          <section id="getting-started">
+            <div class="page-header">
+              <h1>Getting Started</h1>
+            </div>
+            <section id="download">
+              <h2>Download</h2>
+            </section>
+            <section id="setup">
+
+            </section>
+          </section>
+
+          
 
           <section id="wysiwyg">
             <div class="page-header">
@@ -114,7 +126,7 @@
 
             <h4>$().val()</h4>
             <p>Use the familiar <code>val()</code> function to read and write from the editor.</p>
-            <pre class="prettyprint linenums">&lt;textarea data-edit-with="wysiwyg" placeholder="foo"&gt;&lt;textarea&gt;
+            <pre class="prettyprint linenums">&lt;textarea data-edit-with="wysiwyg"&gt;foo&lt;textarea&gt;
 &lt;script&gt;
   $('textarea').val(); // == &lt;p&gt;foo&lt;p&gt;
   $('textarea').val('&lt;b&gt;bar!&lt;/b&gt;'); // HTML editor updated!
@@ -167,12 +179,12 @@
     </div> <!-- /container -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>!window.jQuery && document.write(unescape('%3Cscript src="/js/jquery.js"%3E%3C/script%3E'))</script>
-    <script src="/js/bootstrap.js"></script>
-    <script src="/js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"></script>
-    <script src="/js/plupload/src/plupload.js"></script>
-    <script src="/js/bootstrap-editor.js"></script>
-    <script src="/js/prettify.js"></script>
+    <script>!window.jQuery && document.write(unescape('%3Cscript src="js/jquery.js"%3E%3C/script%3E'))</script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"></script>
+    <script src="js/plupload/src/plupload.js"></script>
+    <script src="js/bootstrap-editor.js"></script>
+    <script src="js/prettify.js"></script>
     <script>
       window.prettyPrint && prettyPrint();
       // This isn't working: $('.bs-docs-sidenav').scrollspy();

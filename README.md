@@ -3,7 +3,7 @@ Bootstrap-Editor
 
 A collection of easy-to-configure content editors for Bootstrap.
 
-Read the [documentation here](http://collegeman.github.com/bootstrap-editor).
+Read the [documentation here](http://collegeman.github.io/bootstrap-editor).
 
 License
 -------

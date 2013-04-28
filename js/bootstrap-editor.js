@@ -1,3 +1,8 @@
+/*
+ * bootstrap-editor v0.1
+ * Copyright (C) 2013 Fat Panda, LLC.
+ * MIT Licensed.
+ */
 !function($, ns) {
 
   var $window = $(window);
@@ -59,7 +64,7 @@
 
       this.$el.hide();
 
-      this.options.css = this.$el.data('tinymce-css') || '/css/tinymce-content.css';
+      this.options.css = this.$el.data('tinymce-css') || 'css/tinymce-content.css';
       this.options.tools = this.$el.data('tinymce-tools') || false;
       this.options.status = this.$el.data('tinymce-status') || false;
       
