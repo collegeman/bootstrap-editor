@@ -1,3 +1,8 @@
+/*
+ * bootstrap-editor v0.1
+ * Copyright (C) 2013 Fat Panda, LLC.
+ * MIT Licensed.
+ */
 !function($, ns) {
 
   var $window = $(window);
