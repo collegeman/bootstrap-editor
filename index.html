@@ -178,7 +178,9 @@
     <script src="js/prettify.js"></script>
     <script>
       window.prettyPrint && prettyPrint();
-      // This isn't working: $('.bs-docs-sidenav').scrollspy();
+      setTimeout(function() {
+        $('.bs-docs-sidenav').scrollspy();
+      }, 100);
     </script>
   </body>
 </html>
