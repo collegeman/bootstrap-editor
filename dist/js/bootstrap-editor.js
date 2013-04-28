@@ -23,7 +23,7 @@
     init: function(options) {
       this.options = options || {};
       
-      this.options.type = ( this.options.type || this.$el.data('edit-with') || defaultEditorType ).toLowerCase();
+      this.options.type = ( this.options.type || this.$el.data('edit-as') || defaultEditorType ).toLowerCase();
       this.options.fullscreen = this.$el.data('fullscreen') !== undefined ? this.$el.data('fullscreen') : true;
       this.options.width = this.$el.data('width') || this.$el.parent().width();
       this.options.height = this.$el.data('height') || '100';
