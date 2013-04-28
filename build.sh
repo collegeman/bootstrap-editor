@@ -1,3 +1,4 @@
+echo 'Building dist...'
 rm -fr ./dist
 mkdir dist
 mkdir dist/js
