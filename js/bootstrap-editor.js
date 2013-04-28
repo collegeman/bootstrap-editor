@@ -310,7 +310,7 @@
     });
   };
 
-  $('[data-edit-with]').each(function() {
+  $('[date-edit-as]').each(function() {
     $(this)[ns]();
   });
 

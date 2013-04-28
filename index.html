@@ -115,9 +115,23 @@
                   <td>A bash script for assembling the contents of the ./dist folder</td>
                 </tr>
               </table>
+              <p>Alternatively, you could add bootstrap-editor to your git project with something like this:</p>
+              <pre>&gt; git submodule add git@github.com:collegeman/bootstrap-editor.git ./htdocs/lib/bootstrap-editor</pre>
             </section>
             <section id="setup">
               <h2>Setup</h2>
+              <p>In your project create a folder called <b>bootstrap-editor</b>, then copy the folder <b>./dist</b>
+                from the source archive into your project.</p>
+              <p>Inside the <code>&lt;head&gt;</code> tag and <em>after</em> the bootstrap stylesheets, add the following:</p>
+              <pre class="prettyprint linenums">&lt;link rel="stylesheet" href="/bootstrap-editor/dist/css/font-awesome.min.css"&gt;
+&lt;link rel="stylesheet" href="/bootstrap-editor/dist/css/bootstrap-editor.min.css"&gt;</pre>
+              <p>And before the closing <code>&lt;/body&gt;</code> tag and <em>after</em> the bootstrap JavaScripts, add the following:</p>
+              <pre class="prettyprint linenums">&lt;!-- if using tinymce: --&gt;
+&lt;script src="/bootstrap-editor/dist/js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"&gt;&lt;/script&gt;
+&lt;!-- if using upload features: --&gt;
+&lt;script src="/bootstrap-editor/dist/js/plupload/plupload.js"&gt;&lt;/script&gt;
+
+&lt;script src="/bootstrap-editor/dist/js/bootstrap-editor.min.js"&gt;&lt;/script&gt;</pre>
             </section>
           </section>
 
@@ -131,37 +145,37 @@
               drag-and-drop uploading, and distraction-free mode.</p>
           
             <div class="bs-docs-example">
-              <textarea data-edit-with="wysiwyg" placeholder="This is where you write and style"></textarea>
+              <textarea date-edit-as="wysiwyg" placeholder="This is where you write and style"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea data-edit-with="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea date-edit-as="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
             
             <hr class="bs-docs-separator">
 
             <h2>Usage</h2>
             <p>Just select an <code>&lt;textarea&gt;</code> using <code>jQuery</code> and call</p>
-            <pre class="prettyprint linenums">$('textarea').editor('wysiwyg');</pre>
+            <pre class="prettyprint linenums">$('textarea.ed').editor('wysiwyg');</pre>
 
             <h3>Markup</h3>
             <p>You will use data attributes to configure your TinyMCE editor. When the DOM is ready, any <code>&lt;textarea&gt;</code>
-              having <code>data-edit-with="wysiwyg"</code> will automatically become a TinyMCE editor.</p>
+              having <code>date-edit-as="wysiwyg"</code> will automatically become a TinyMCE editor.</p>
 
             <h3>Methods</h3>
 
             <h4>$().val()</h4>
             <p>Use the familiar <code>val()</code> function to read and write from the editor.</p>
-            <pre class="prettyprint linenums">&lt;textarea data-edit-with="wysiwyg"&gt;foo&lt;textarea&gt;
+            <pre class="prettyprint linenums">&lt;textarea date-edit-as="wysiwyg"&gt;foo&lt;textarea&gt;
 &lt;script&gt;
-  $('textarea').val(); // == &lt;p&gt;foo&lt;p&gt;
-  $('textarea').val('&lt;b&gt;bar!&lt;/b&gt;'); // HTML editor updated!
+  $('textarea.ed').val(); // == &lt;p&gt;foo&lt;p&gt;
+  $('textarea.ed').val('&lt;b&gt;bar!&lt;/b&gt;'); // HTML editor updated!
 &lt;/script&gt;</pre>
 
             <h4>$().editor('exec', cmd)</h4>
             <p>This will invoke <code>TinyMCE.execCommand(cmd)</code> and so provides you with direct access
               to the <a href="http://www.tinymce.com/wiki.php/Command_identifiers" target="_blank">TinyMCE API</a>.</p>
-            <pre class="prettyprint linenums">$('textarea').editor('exec', 'bold'); // current selection will toggled bold</pre>
+            <pre class="prettyprint linenums">$('textarea.ed').editor('exec', 'bold'); // current selection will toggled bold</pre>
             <p>Our proxy method accepts all of the parameters accepted by <code>TinyMCE.execCommand()</code>:</p>
-            <pre class="prettyprint linenums">$('textarea').editor('exec', cmd, ui, val);</pre>
+            <pre class="prettyprint linenums">$('textarea.ed').editor('exec', cmd, ui, val);</pre>
 
           </seection>
           
@@ -180,10 +194,10 @@
             <p>Transform a <code>&lt;textarea&gt;</code> input into a Markdown editor with <a href="https://code.google.com/p/pagedown/">preview</a>, drag-and-drop uploading, and distraction-free mode.</p>
             
             <div class="bs-docs-example">
-              <textarea data-edit-with="markdown" placeholder="This is where you write; forget style!"></textarea>
+              <textarea date-edit-as="markdown" placeholder="This is where you write; forget style!"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea data-edit-with="markdown" placeholder="This is where you write; forget style!"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea date-edit-as="markdown" placeholder="This is where you write; forget style!"&gt;&lt;textarea&gt;</pre>
           </section>
 
           <hr class="bs-docs-separator">
@@ -200,10 +214,10 @@
             <h2>ACE</h2>
             <p>Transform a <code>&lt;textarea&gt;</code> input into an <a href="http://ajaxorg.github.io/ace/#nav=about">ACE</a> code editor.</p> 
             <div class="bs-docs-example">
-              <textarea data-edit-with="source"></textarea>
+              <textarea date-edit-as="source"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea data-edit-with="source"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea date-edit-as="source"&gt;&lt;textarea&gt;</pre>
           </section>
 
         </div><!-- /.span9 -->
@@ -213,7 +227,8 @@
     <footer class="footer">
       <div class="container">
         <p>The talents and gifts of many, combined by <a href="http://aaroncollegeman.com" target="_blank">@collegeman</a>.</p>
-        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">MIT License</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+        <p>Code licensed under <a href="http://opensource.org/licenses/MIT" target="_blank">MIT License</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+        <p>Plupload licensed under <a href="http://www.plupload.com/license.php" target="_blank">GPLv2</a>, with <a href="http://www.plupload.com/download.php" target="_blank">commercial licenses available</a>.</p>
         <ul class="footer-links">
           <li><a href="http://fatpandadev.com">Fat Panda</a></li>
           <li class="muted">·</li>
@@ -228,7 +243,7 @@
     <script>!window.jQuery && document.write(unescape('%3Cscript src="js/jquery.js"%3E%3C/script%3E'))</script>
     <script src="js/bootstrap.js"></script>
     <script src="js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"></script>
-    <script src="js/plupload/src/plupload.js"></script>
+    <script src="js/plupload/plupload.js"></script>
     <script src="js/bootstrap-editor.js"></script>
     <script src="js/prettify.js"></script>
     <script>
