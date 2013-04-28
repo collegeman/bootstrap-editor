@@ -27,7 +27,7 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -60,7 +60,7 @@
       <div class="row">
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="200">
-            <li><a href="#about"><i class="icon-chevron-right"></i> About</a></li>
+            <li><a href="#about"><i class="icon-chevron-right"></i> Overview</a></li>
             <li><a href="#files"><i class="icon-chevron-right"></i> Download</a></li>
             <li><a href="#setup"><i class="icon-chevron-right"></i> Setup</a></li>
             <li><a href="#wysiwyg"><i class="icon-chevron-right"></i> WYSIWYG Editor</a></li>
@@ -137,18 +137,17 @@
 
           <section id="wysiwyg">
             <div class="page-header">
-              <h1>WYSIWYG Editor</h1>
+              <h1>WYSIWYG Editor <small>TinyMCE</small></h1>
             </div>
 
-            <h2>TinyMCE</h2>
             <p>Transform a <code>&lt;textarea&gt;</code> input into a <a href="http://www.tinymce.com/" target="_blank">TinyMCE</a> editor with formatting tools,
               drag-and-drop uploading, and distraction-free mode.</p>
           
             <div class="bs-docs-example">
-              <textarea date-edit-as="wysiwyg" placeholder="This is where you write and style"></textarea>
+              <textarea data-edit-as="wysiwyg" placeholder="This is where you write and style"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea date-edit-as="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea data-edit-as="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
             
             <hr class="bs-docs-separator">
 
@@ -158,13 +157,13 @@
 
             <h3>Markup</h3>
             <p>You will use data attributes to configure your TinyMCE editor. When the DOM is ready, any <code>&lt;textarea&gt;</code>
-              having <code>date-edit-as="wysiwyg"</code> will automatically become a TinyMCE editor.</p>
+              having <code>data-edit-as="wysiwyg"</code> will automatically become a TinyMCE editor.</p>
 
             <h3>Methods</h3>
 
             <h4>$().val()</h4>
             <p>Use the familiar <code>val()</code> function to read and write from the editor.</p>
-            <pre class="prettyprint linenums">&lt;textarea date-edit-as="wysiwyg"&gt;foo&lt;textarea&gt;
+            <pre class="prettyprint linenums">&lt;textarea data-edit-as="wysiwyg"&gt;foo&lt;textarea&gt;
 &lt;script&gt;
   $('textarea.ed').val(); // == &lt;p&gt;foo&lt;p&gt;
   $('textarea.ed').val('&lt;b&gt;bar!&lt;/b&gt;'); // HTML editor updated!
@@ -183,41 +182,39 @@
       
           <section id="markdown">
             <div class="page-header">
-              <h1>Markdown Editor</h1>
+              <h1>Markdown Editor <small>PageDown</small></h1>
             </div>
 
             <div class="alert alert-error">
               <b>Note:</b> This is editor is incomplete.
             </div>
 
-            <h2>PageDown</h2>
             <p>Transform a <code>&lt;textarea&gt;</code> input into a Markdown editor with <a href="https://code.google.com/p/pagedown/">preview</a>, drag-and-drop uploading, and distraction-free mode.</p>
             
             <div class="bs-docs-example">
-              <textarea date-edit-as="markdown" placeholder="This is where you write; forget style!"></textarea>
+              <textarea data-edit-as="markdown" placeholder="This is where you write; forget style!"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea date-edit-as="markdown" placeholder="This is where you write; forget style!"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea data-edit-as="markdown" placeholder="This is where you write; forget style!"&gt;&lt;textarea&gt;</pre>
           </section>
 
           <hr class="bs-docs-separator">
 
           <section id="code">
             <div class="page-header">
-              <h1>Code Editor</h1>
+              <h1>Code Editor <small>ACE</small></h1>
             </div>
 
             <div class="alert alert-error">
               <b>Note:</b> This is editor is incomplete.
             </div>
 
-            <h2>ACE</h2>
             <p>Transform a <code>&lt;textarea&gt;</code> input into an <a href="http://ajaxorg.github.io/ace/#nav=about">ACE</a> code editor.</p> 
             <div class="bs-docs-example">
-              <textarea date-edit-as="source"></textarea>
+              <textarea data-edit-as="source"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea date-edit-as="source"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea data-edit-as="source"&gt;&lt;textarea&gt;</pre>
           </section>
 
         </div><!-- /.span9 -->
@@ -250,9 +247,14 @@
     <script src="js/prettify.js"></script>
     <script>
       window.prettyPrint && prettyPrint();
-      setTimeout(function() {
-        $('.bs-docs-sidenav').scrollspy();
-      }, 200);
+      setTimeout(function () {
+        $('.bs-docs-sidenav').affix({
+          offset: {
+            top: function () { return $(window).width() <= 980 ? 290 : 210 }
+          , bottom: 270
+          }
+        })
+      }, 100);
     </script>
   </body>
 </html>
