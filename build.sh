@@ -8,3 +8,5 @@ cp css/* ./dist/css
 cp font/* ./dist/font
 cp -R docs/js/tinymce ./dist/js
 rm -fr ./dist/js/tinymce/.git*
+yuicompressor --preserve-semi ./dist/js/bootstrap-editor.js > ./dist/js/bootstrap-editor.min.js
+yuicompressor --preserve-semi ./dist/css/bootstrap-editor.css > ./dist/css/bootstrap-editor.min.css
