@@ -36,4 +36,6 @@ table.mceLayout, .mceIframeContainer { border: none !important; }
 .bootstrap-mce-editor .tools .tool-btn.active .select { display: block; }
 .bootstrap-mce-editor .tools i.icon-caret-down { margin-left: 5px; }
 span.arrow { left: 9px !important; bottom: -11px !important; display: inline-block !important; position: absolute !important; width: 17px !important; height: 13px !important; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAANCAQAAADlcE2RAAAAZklEQVQY06XKQQqAIBBG4dl4BzfiLbqJ4BW8qki/LvQmLVpNUARRowW9t/1o4bfpAwGvQwCmEjAEJVCzxaMPfLOUVDSziMCzjyYpog66ABLRDTyRAE4Ehx3ACeBAVecJnKeqRfCrDfKYBwoUKo4fAAAAAElFTkSuQmCC) !important; }
-
+.bootstrap-mce-editor .dropzone { display: none; top: 0; left: 0; bottom: 0; right: 0; opacity: 0.80; position: absolute; border: 3px dashed #ccc; background-color: white; margin: 10px; }
+.bootstrap-mce-editor .dropzone span { font-size: 40px; color: #ccc; display: block; position: absolute; text-align: center; width: 100%; top: 50%; margin-top: -10px; }
+body.dragging .bootstrap-mce-editor .dropzone, .bootstrap-mce-editor.receiving .dropzone { display: block; }

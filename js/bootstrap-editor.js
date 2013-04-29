@@ -5,7 +5,7 @@
  */
 !function($, ns) {
 
-  var $window = $(window);
+  var $window = $(window), $body = $('body');
 
   window.console = window.console || { log: function() {}, error: function() {} };
 
@@ -176,7 +176,8 @@
           $el.bind('tinymce-focus', hideAllSelectContainers);
 
           that.tinymce.$el.append(that.$tools);
-
+          that.tinymce.$el.append('<div class="dropzone"><span>Drop files here</span></div>');
+          
           /*
           var uploader = new plupload.Uploader({
             runtimes : 'gears,html5,flash,silverlight,browserplus',
@@ -296,6 +297,25 @@
     }
 
   };
+
+  var dragActionTimeout;
+
+  $window.on('dragover', function(e) {
+    clearTimeout(dragActionTimeout);
+    $body.addClass('dragging');
+  });
+  $window.on('dragend', function(e) {
+    clearTimeout(dragActionTimeout);
+    dragActionTimeout = setTimeout(function() {
+      $body.removeClass('dragging');
+    }, 500);
+  });
+  $window.on('dragleave', function(e) {
+    clearTimeout(dragActionTimeout);
+    dragActionTimeout = setTimeout(function() {
+      $body.removeClass('dragging');
+    }, 500);
+  });
 
   $.fn[ns] = function(fn /*, ... */) {
     var args = Array.prototype.slice.apply(arguments);
