@@ -8,17 +8,17 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="/bootstrap-editor/css/bootstrap.css" rel="stylesheet">
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
-    <link href="css/font-awesome.css" rel="stylesheet"> 
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="css/bootstrap-editor.css" rel="stylesheet">
-    <link href="css/docs.css" rel="stylesheet">
-    <link href="css/prettify.css" rel="stylesheet">
+    <link href="/bootstrap-editor/css/font-awesome.css" rel="stylesheet"> 
+    <link href="/bootstrap-editor/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/bootstrap-editor/css/bootstrap-editor.css" rel="stylesheet">
+    <link href="/bootstrap-editor/css/docs.css" rel="stylesheet">
+    <link href="/bootstrap-editor/css/prettify.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -86,40 +86,40 @@
                 In the archive you will find the following:</p>
               <table class="table">
                 <tr>
-                  <th>./css</th>
+                  <th>/bootstrap-editor/css</th>
                   <td>Stylesheets for all editors, as well as for <a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a></td>
                 </tr>
                 <tr>
-                  <th>./dist</th>
+                  <th>/bootstrap-editor/dist</th>
                   <td>All the files you will need to use bootstrap-editor in production</td>
                 </tr>
                 <tr>
-                  <th>./docs</th>
+                  <th>/bootstrap-editor/docs</th>
                   <td>A copy of these docs</td>
                 </tr>
                 <tr>
-                  <th>./font</th>
+                  <th>/bootstrap-editor/font</th>
                   <td>The font files for <a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a></td>
                 </tr>
                 <tr>
-                  <th>./js</th>
+                  <th>/bootstrap-editor/js</th>
                   <td>The JavaScript libraries</td>
                 </tr>
                 <tr>
-                  <th>./build-docs.sh</th>
+                  <th>/bootstrap-editor/build-docs.sh</th>
                   <td>A bash script for building and publishing this documentation</td>
                 </tr>
                 <tr>
-                  <th>./build.sh</th>
-                  <td>A bash script for assembling the contents of the ./dist folder</td>
+                  <th>/bootstrap-editor/build.sh</th>
+                  <td>A bash script for assembling the contents of the /bootstrap-editor/dist folder</td>
                 </tr>
               </table>
               <p>Alternatively, you could add bootstrap-editor to your git project with something like this:</p>
-              <pre>&gt; git submodule add git@github.com:collegeman/bootstrap-editor.git ./htdocs/lib/bootstrap-editor</pre>
+              <pre>&gt; git submodule add git@github.com:collegeman/bootstrap-editor.git /bootstrap-editor/htdocs/lib/bootstrap-editor</pre>
             </section>
             <section id="setup">
               <h2>Setup</h2>
-              <p>In your project create a folder called <b>bootstrap-editor</b>, then copy the folder <b>./dist</b>
+              <p>In your project create a folder called <b>bootstrap-editor</b>, then copy the folder <b>/bootstrap-editor/dist</b>
                 from the source archive into your project.</p>
               <p>Inside the <code>&lt;head&gt;</code> tag and <em>after</em> the bootstrap stylesheets, add the following:</p>
               <pre class="prettyprint linenums">&lt;link rel="stylesheet" href="/bootstrap-editor/dist/css/font-awesome.min.css"&gt;
@@ -143,7 +143,7 @@
               drag-and-drop uploading, and distraction-free mode.</p>
           
             <div class="bs-docs-example">
-              <textarea data-edit-as="wysiwyg" placeholder="This is where you write and style"></textarea>
+              <textarea data-edit-as="wysiwyg" data-tinymce-css="/bootstrap-editor/css/tinymce-content.css" placeholder="This is where you write and style"></textarea>
             </div>
 
             <pre class="prettyprint linenums">&lt;textarea data-edit-as="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
@@ -238,12 +238,12 @@
     </footer>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>!window.jQuery && document.write(unescape('%3Cscript src="js/jquery.js"%3E%3C/script%3E'))</script>
-    <script src="js/bootstrap.js"></script>
-    <script src="js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"></script>
-    <script src="js/plupload/plupload.js"></script>
-    <script src="js/bootstrap-editor.js"></script>
-    <script src="js/prettify.js"></script>
-    <script src="js/docs.js"></script>
+    <script>!window.jQuery && document.write(unescape('%3Cscript src="/bootstrap-editor/js/jquery.js"%3E%3C/script%3E'))</script>
+    <script src="/bootstrap-editor/js/bootstrap.js"></script>
+    <script src="/bootstrap-editor/js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"></script>
+    <script src="/bootstrap-editor/js/plupload/plupload.js"></script>
+    <script src="/bootstrap-editor/js/bootstrap-editor.js"></script>
+    <script src="/bootstrap-editor/js/prettify.js"></script>
+    <script src="/bootstrap-editor/js/docs.js"></script>
   </body>
 </html>
