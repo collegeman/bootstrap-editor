@@ -1,5 +1,5 @@
 /*
- * bootstrap-editor v0.1
+ * bootstrap-editor v0.2
  * Copyright (C) 2013 Fat Panda, LLC.
  * MIT Licensed.
  */
@@ -21,16 +21,33 @@
   Editor.prototype = {
 
     init: function(options) {
+      var that = this;
+      
       this.options = options || {};
       
       this.options.type = ( this.options.type || this.$el.data('edit-as') || defaultEditorType ).toLowerCase();
       this.options.fullscreen = this.$el.data('fullscreen') !== undefined ? this.$el.data('fullscreen') : true;
-      this.options.width = this.$el.data('width') || this.$el.parent().width();
+      this.options.width = this.$el.data('width') || '100%';
       this.options.height = this.$el.data('height') || '100';
       this.options.maxHeight = this.$el.data('max-height') || $window.height() * 0.60;
       
       this.$el.addClass('bootstrap-editor bootstrap-editor-' + this.options.type);
       this.$el.addClass(this.classId = 'bootstrap-editor-' + (Editor.elIdx++));
+
+      this.$el.on('init', function() {
+        if (that.options.width === 'auto' || that.options.width === '100%') {
+          var resizeTimeout, curWidth;
+          setInterval(function() {
+            // TODO: tie this interval to object destruction
+            if (that.$el.parent().width() !== curWidth) {
+              curWidth = that.$el.parent().width();
+              clearTimeout(resizeTimeout);
+              setTimeout($.proxy(that.fill, that), 100);
+            }
+          }, 100);
+        }
+      });
+
       this['init_' + this.options.type](options);
     },
 
@@ -51,6 +68,10 @@
       this.val = function(val) {
         if (val !== undefined) {
           this.tinymce.setContent(val);
+          if (this.$el.attr('placeholder') && ( !val || !val.trim() )) {
+            this.tinymce.setContent(this.$el.attr("placeholder"));
+            $(this.tinymce.getDoc()).find('body').addClass('placeheld');
+          }
           return this;
         } else {
           val = this.tinymce.getContent();
@@ -60,6 +81,10 @@
             return val;
           }
         }
+      };
+
+      this.fill = function() {
+        this.tinymce.theme.resizeTo(this.$el.parent().width());
       };
 
       this.$el.hide();
@@ -98,7 +123,7 @@
           that.tinymce = tinyMCE.get($el.attr('id'));
           that.tinymce.$el = $('#' + that.tinymce.editorContainer).css({ position: 'relative', display: 'inline-block' });
           that.tinymce.$el.addClass('bootstrap-mce-editor');
-
+  
           // setup formatters
           that.tinymce.formatter.register('fontSizeHuge', {
             inline: 'span',
