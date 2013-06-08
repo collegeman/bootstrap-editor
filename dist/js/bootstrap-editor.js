@@ -1,5 +1,5 @@
 /*
- * bootstrap-editor v0.1
+ * bootstrap-editor v0.2
  * Copyright (C) 2013 Fat Panda, LLC.
  * MIT Licensed.
  */
@@ -68,6 +68,10 @@
       this.val = function(val) {
         if (val !== undefined) {
           this.tinymce.setContent(val);
+          if (this.$el.attr('placeholder') && ( !val || !val.trim() )) {
+            this.tinymce.setContent(this.$el.attr("placeholder"));
+            $(this.tinymce.getDoc()).find('body').addClass('placeheld');
+          }
           return this;
         } else {
           val = this.tinymce.getContent();
