@@ -39,3 +39,8 @@ span.arrow { left: 9px !important; bottom: -11px !important; display: inline-blo
 .bootstrap-mce-editor .dropzone { display: none; top: 0; left: 0; bottom: 0; right: 0; opacity: 0.80; position: absolute; border: 3px dashed #ccc; background-color: white; margin: 10px; }
 .bootstrap-mce-editor .dropzone span { font-size: 40px; color: #ccc; display: block; position: absolute; text-align: center; width: 100%; top: 50%; margin-top: -10px; }
 body.dragging .bootstrap-mce-editor .dropzone, .bootstrap-mce-editor.receiving .dropzone { display: block; }
+.contenteditable.btns { display: none; position: absolute; width: 340px; border-radius: 4px; }
+.contenteditable.btns:after { top: 100%; border: solid transparent; content: " "; height: 0; width: 0; position: absolute; pointer-events: none; }
+.contenteditable.btns:after { border-color: rgba(11, 15, 18, 0); border-top-color: #0b0f12; border-width: 10px; left: 50%; margin-left: -10px; }
+.bootstrap-editor-wysiwyg.placeheld > p { color: #bbb; }
+.bootstrap-editor-wysiwyg { outline: none; }
