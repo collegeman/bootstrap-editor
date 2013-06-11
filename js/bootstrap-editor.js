@@ -74,7 +74,8 @@
           selection, 
           range;
 
-      this.options.tools = $el.attr('tools') || !isHeadingTag;
+      this.options.tools = $el.data('tools') || !isHeadingTag;
+      this.options.maxLength = $el.data('max-length') || false;
 
       var $toolbar = $('#' + ns + '-wysiwyg-toolbar');
 
@@ -88,7 +89,7 @@
         $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H2</button>');
         $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-quote-left"></i></button>');
         $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-link"></i></button>');
-        $('body').append($toolbar);
+        $body.append($toolbar);
       }
 
       var isEmpty = function() {
@@ -136,7 +137,7 @@
         }
 
         $toolbar.css({ 
-          'top': ( rect.top - $toolbar.height() - 15 ) + 'px',
+          'top': ( rect.top - $toolbar.height() - 18 ) + 'px',
           'left': left + 'px' 
         }).show();
 
@@ -247,29 +248,55 @@
 
       var onPaste = function(e) {
         var $textarea = $('<textarea style="position:absolute; left: -1000px;"></textarea>');
-        $('body').append($textarea);
+        $body.append($textarea);
         !function() {
           var range = saveSelection();
           $textarea.focus();
           setTimeout(function() {
             var val = $textarea.val();
             $textarea.remove();
-            restoreSelection(range);
-            insertTextAtCursor(val);
+            // restoreSelection(range);
+            if (placeheld) {
+              placeheld = false;
+              isHeadingTag ? $el.html('') : $el.find('> p').text('');
+              $el.removeClass('placeheld');
+              $el.text(val);
+              /*
+              if (captureSelection()) {
+                range.selectNodeContents(editable);
+                forceParagraphTagFor($(range.commonAncestorContainer));
+                range.selectNodeContents(editable);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+              }
+              */
+            } else {
+              insertTextAtCursor(val);
+            }
           }, 0);
         }();
       }
 
-      if (isOpera || isFirefox) {
-        $el.on('keydown', function(e) {
-          if ((($Sq.isMac ? e.metaKey : e.ctrlKey) && e.keyCode == 86) || (e.shiftKey && e.keyCode == 45)) {
+      $el.keydown(function(e) {
+        var isDelKey = ( e.keyCode || e.which ) === 8;
+        var isSelectAll = e.metaKey && ( e.keyCode || e.which ) === 65;
+        if (that.options.maxLength && !placeheld && !isDelKey && !isSelectAll) {
+          if ($('<div>' + $el.html() + '</div>').text().length >= that.options.maxLength) {
+            return false;
+          }
+        }
+        if (isOpera || isFirefox) {
+          if (((isMac ? e.metaKey : e.ctrlKey) && e.keyCode == 86) || (e.shiftKey && e.keyCode == 45)) {
             onPaste(e);
           }
-        });
-      } else {
+        }
+      });
+
+      if (!isOpera && !isFirefox) {
         $el.on('paste', onPaste);
       }
-   
+      
       function forceParagraphTagFor($element) {
         // console.log($element);
       };
@@ -283,7 +310,7 @@
           } else {
             hideToolbar();
           }
-        }, 10);
+        }, 1);
       });
 
       // When the user touches an editor
@@ -301,7 +328,7 @@
           } else {
             hideToolbar();
           }
-        }, 10);
+        }, 1);
       });
 
       if ($el.attr('placeholder')) {
