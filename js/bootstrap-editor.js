@@ -1,11 +1,15 @@
 /*
- * bootstrap-editor v0.1
+ * bootstrap-editor v0.3
  * Copyright (C) 2013 Fat Panda, LLC.
  * MIT Licensed.
  */
 !function($, ns) {
 
   var $window = $(window), $body = $('body');
+  var d = document, na = navigator, ua = na.userAgent;
+  var isOpera = window.opera && opera.buildNumber;
+  var isFirefox = /Firefox/.test(ua);
+  var isMac = ua.indexOf('Mac') != -1;
 
   window.console = window.console || { log: function() {}, error: function() {} };
 
@@ -21,20 +25,20 @@
   Editor.prototype = {
 
     init: function(options) {
-      var that = this;
+      var that = this, $el = this.$el;
       
+      var contentEditableType = $el.attr('contenteditable') ? 'wysiwyg' : false;
       this.options = options || {};
+      this.options.type = ( this.options.type || $el.data('edit-as') || contentEditableType || defaultEditorType ).toLowerCase();
+      this.options.fullscreen = $el.data('fullscreen') !== undefined ? $el.data('fullscreen') : true;
+      this.options.width = $el.data('width') || '100%';
+      this.options.height = $el.data('height') || '100';
+      this.options.maxHeight = $el.data('max-height') || $window.height() * 0.60;
       
-      this.options.type = ( this.options.type || this.$el.data('edit-as') || defaultEditorType ).toLowerCase();
-      this.options.fullscreen = this.$el.data('fullscreen') !== undefined ? this.$el.data('fullscreen') : true;
-      this.options.width = this.$el.data('width') || '100%';
-      this.options.height = this.$el.data('height') || '100';
-      this.options.maxHeight = this.$el.data('max-height') || $window.height() * 0.60;
-      
-      this.$el.addClass('bootstrap-editor bootstrap-editor-' + this.options.type);
-      this.$el.addClass(this.classId = 'bootstrap-editor-' + (Editor.elIdx++));
+      $el.addClass('bootstrap-editor bootstrap-editor-' + this.options.type);
+      $el.addClass(this.classId = 'bootstrap-editor-' + ( ++Editor.elIdx ).toString());
 
-      this.$el.on('init', function() {
+      $el.on('init', function() {
         if (that.options.width === 'auto' || that.options.width === '100%') {
           var resizeTimeout, curWidth;
           setInterval(function() {
@@ -60,6 +64,454 @@
     },
 
     init_wysiwyg: function() {
+      var that = this,
+          $el = this.$el, 
+          thePlaceholder = $el.attr('placeholder'), 
+          tag = this.$el.prop('tagName').toLowerCase(),
+          placeheld = false, 
+          isHeadingTag = tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6',
+          editable = $el.get(0), 
+          selection, 
+          range;
+
+      this.options.tools = $el.data('tools') || !isHeadingTag;
+      this.options.maxLength = $el.data('max-length') || false;
+
+      var $toolbar = $('#' + ns + '-wysiwyg-toolbar');
+
+      if (this.options.tools && !$toolbar.length) {
+        var $btnGroup = $('<div class="inner btn-group"></div>');
+        $toolbar = $('<div id="' + ns + '-wysiwyg-toolbar" class="contenteditable btns"></div>');
+        $toolbar.append($btnGroup);
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-bold"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-italic"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H1</button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H2</button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-quote-left"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-link"></i></button>');
+        $body.append($toolbar);
+      }
+
+      var undoStack = [], redoStack = [];
+
+      var doUndo = function() {
+        if (undoStack.length) {
+          var last = undoStack.pop();
+          last.exec();
+          redoStack.push(last);
+          if (isEmpty()) {
+            setTimeout(function() {
+              $el.focus();
+            }, 10);
+          } else {
+            moveCaret();
+          }
+        }
+        console.log('undo', undoStack, redoStack);
+      };
+
+      var doRedo = function() {
+        if (redoStack.length) {
+          var last = redoStack.pop();
+          last.exec();
+          undoStack.push(last);
+          if (isEmpty()) {
+            setTimeout(function() {
+              $el.focus();
+            }, 10);
+          } else {
+            moveCaret();
+          }
+        }
+        console.log('redo', undoStack, redoStack);
+      };
+
+      var pushToUndo = function() {
+        redoStack = [];
+        // TODO: consider cloning here instead:
+        var previousVal = $el.html();
+        undoStack.push({
+          __previous__: previousVal.length ? previousVal : false,
+          exec: function() {
+            var currentVal = $el.html();
+            redoStack.push({
+              exec: function() {
+                $el.html(currentVal);
+              }
+            });
+            $el.html(previousVal);
+          }
+        });
+        console.log('pushToUndo', undoStack, redoStack);
+      };
+
+      var isEmpty = function() {
+        return $('<div>' + $el.html() + '</div>').text().trim().length < 1;
+      };
+
+      var getPlaceholder = function() {
+        if (!thePlaceholder) {
+          return false;
+        } else {
+          return '<p>' + thePlaceholder + '</p>';
+        }
+      };
+
+      var isPlaceholder = function() {
+        return $('<div>' + $el.html() + '</div>').text().trim() === thePlaceholder;
+      };
+
+      var moveCaret = function(head) {
+        var range,selection;
+        if (document.createRange) { //Firefox, Chrome, Opera, Safari, IE 9+ 
+          range = document.createRange();//Create a range (a range is a like the selection but invisible)
+          range.selectNodeContents(editable);//Select the entire contents of the element with the range
+          range.collapse(head ? true : false);//collapse the range to the end point. false means collapse to end rather than the start
+          selection = window.getSelection();//get the selection object (allows you to change selection)
+          selection.removeAllRanges();//remove any selections already made
+          selection.addRange(range);//make the range you have just created the visible selection
+        } else if(document.selection) { //IE 8 and lower
+          range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
+          range.moveToElementText(editable);//Select the entire contents of the element with the range
+          range.collapse(head ? true : false);//collapse the range to the end point. false means collapse to end rather than the start
+          range.select();//Select the range (make it the visible selection
+        }
+      };
+
+      this.val = function(val) {
+        if (val !== undefined) {
+          this.$el.html(val);
+          if (thePlaceholder && ( !val || !val.trim() )) {
+            this.$el.html(getPlaceholder());
+            this.$el.addClass('placeheld');
+          }
+          return this;
+        } else {
+          val = this.$el.html();
+          if (thePlaceholder && $(val).text().trim() === thePlaceholder) {
+            return '';
+          } else {
+            return val;
+          }
+        }
+      };
+
+      var showToolbarOn = function(rect) {
+        var left = ( rect.left + ( rect.width / 2 ) - ( $toolbar.width() / 2 ) ), offset = 0;
+
+        // offset to keep the toolbar on the screen
+        if (left < 0) {
+          offset = ( -1 * left + 15 );
+        } else if (left + $toolbar.width() > $window.width()) {
+          offset = $window.width() - ( left + $toolbar.width() ) - 20;
+        }
+
+        $toolbar.css({ 
+          'top': ( rect.top - $toolbar.height() - 18 ) + 'px',
+          'left': left + 'px' 
+        }).show();
+
+        $toolbar.find('.inner').css({ 'left': offset + 'px' });
+      };
+
+      var hideToolbar = function() {
+        $toolbar.hide();
+      };
+
+      // Populates selection and range variables
+      var captureSelection = function(e) {
+        // Don't capture selection outside editable region
+        var isOrContainsAnchor = false,
+          isOrContainsFocus = false,
+          sel = window.getSelection(),
+          parentAnchor = sel.anchorNode,
+          parentFocus = sel.focusNode;
+
+        while (parentAnchor && parentAnchor != document.documentElement) {
+          if (parentAnchor == editable) {
+            isOrContainsAnchor = true;
+          }
+          parentAnchor = parentAnchor.parentNode;
+        }
+
+        while (parentFocus && parentFocus != document.documentElement) {
+          if (parentFocus == editable) {
+            isOrContainsFocus = true;
+          }
+          parentFocus = parentFocus.parentNode;
+        }
+
+        selection = window.getSelection();
+
+        if (!isOrContainsAnchor || !isOrContainsFocus) {
+          return false;
+        }
+
+        // Get range (standards)
+        if (selection.getRangeAt !== undefined) {
+          range = selection.getRangeAt(0);
+          return true;
+        // Get range (Safari 2)
+        } else if (
+          document.createRange &&
+          selection.anchorNode &&
+          selection.anchorOffset &&
+          selection.focusNode &&
+          selection.focusOffset
+        ) {
+          range = document.createRange();
+          range.setStart(selection.anchorNode, selection.anchorOffset);
+          range.setEnd(selection.focusNode, selection.focusOffset);
+          return true;
+        } else {
+          // Failure here, not handled by the rest of the script.
+          // Probably IE or some older browser
+          return false;
+        }
+      };
+
+      var saveSelection = function() {
+        if (window.getSelection) {
+          sel = window.getSelection();
+          if (sel.getRangeAt && sel.rangeCount) {
+              return sel.getRangeAt(0);
+          }
+        } else if (document.selection && document.selection.createRange) {
+          return document.selection.createRange();
+        }
+        return null;
+      };
+
+      var restoreSelection = function(range) {
+        if (range) {
+          if (window.getSelection) {
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          } else if (document.selection && range.select) {
+            range.select();
+          }
+        }
+      };
+
+      var insertTextAtCursor = function(text) {
+        var sel, range, html;
+        if (window.getSelection) {
+          sel = window.getSelection();
+          if (sel.getRangeAt && sel.rangeCount) {
+            range = sel.getRangeAt(0);
+            range.deleteContents();
+            var textNode = document.createTextNode(text) 
+            range.insertNode(textNode);
+            sel.removeAllRanges();
+            range = range.cloneRange();
+            range.selectNode(textNode);
+            range.collapse(false);
+            sel.addRange(range);
+          }
+        } else if (document.selection && document.selection.createRange) {
+          range = document.selection.createRange();
+          range.pasteHTML(text);
+          range.select();
+        }
+      };
+
+      var onPaste = function(e) {
+        var $textarea = $('<textarea style="position:absolute; left: -1000px; top: ' + $window.scrollTop() + 'px"></textarea>');
+        $body.append($textarea);
+        !function() {
+          var range = saveSelection();
+          $textarea.focus();
+          setTimeout(function() {
+            var val = $textarea.val();
+            $textarea.remove();
+            restoreSelection(range);
+            if (placeheld) {
+              placeheld = false;
+              isHeadingTag ? $el.html('') : $el.find('> p').text('');
+              // pushToUndo();
+              $el.removeClass('placeheld');
+              $el.text(val);
+              if (captureSelection()) {
+                range.selectNodeContents(editable);
+                forceParagraphTagFor($(range.commonAncestorContainer));
+                range.selectNodeContents(editable);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+              }
+            } else {
+              // pushToUndo();
+              insertTextAtCursor(val);
+            }
+          }, 0);
+        }();
+      }
+
+      $el.keydown(function(e) {
+        var key = e.keyCode || e.which;
+        var isDelKey = key === 8;
+        var isSelectAll = e.metaKey && key === 65;
+        var isUndo = e.metaKey && key === 90;
+        var isRedo = e.shiftKey && e.metaKey && key === 90;
+        var isIgnored = isDelKey || isSelectAll;
+
+        if (isDelKey) {
+          pushToUndo();
+        }
+
+        if (isIgnored) {
+          return true;
+        }
+
+        if (isRedo) {
+          if (placeheld) {
+            return false;
+          }
+          doRedo();
+          return false;
+        }
+
+        if (isUndo) {
+          if (placeheld) {
+            return false;
+          }
+          doUndo();
+          return false;
+        }
+
+        // If space or enter keys are stroked, push to undo stack
+        if (key === 32 || key === 13) {
+          pushToUndo();
+        }
+
+        // Enforce length limitations
+        if (that.options.maxLength && !placeheld) {
+          if ($('<div>' + $el.html() + '</div>').text().length >= that.options.maxLength) {
+            return false;
+          }
+        }
+
+        // Handle onPaste action in Opera and Firefox
+        if (isOpera || isFirefox) {
+          if (((isMac ? e.metaKey : e.ctrlKey) && e.keyCode == 86) || (e.shiftKey && e.keyCode == 45)) {
+            onPaste(e);
+          }
+        }
+      });
+
+      if (!isOpera && !isFirefox) {
+        $el.on('paste', onPaste);
+      }
+      
+      function forceParagraphTagFor($element) {
+        // container?
+        if ($element.data('editor') === $el.data('editor')) {
+          $el.html('<p>' + $el.text() + '</p>');
+        } else {
+          console.log('no');
+        }
+      };
+
+      // Recalculate selection while typing
+      var keyUpTimeout;
+      $el.keyup(function(e) {
+        clearTimeout(keyUpTimeout);
+        keyUpTimeout = setTimeout(function() {
+          if (captureSelection(e) && !selection.isCollapsed && selection.type !== 'Caret') {
+            forceParagraphTagFor($(range.commonAncestorContainer));
+            showToolbarOn(range.getBoundingClientRect());
+          } else {
+            hideToolbar();
+          }
+        }, 1);
+      });
+
+      // When the user touches an editor
+      $el.mousedown(function(e) {
+        if (placeheld) {
+          $el.focus();
+          return false;
+        }
+      });
+    
+      $(document).mouseup(function(e) {
+        setTimeout(function() {
+          if (!placeheld && captureSelection(e) && !selection.isCollapsed && selection.type !== 'Caret') {
+            showToolbarOn(range.getBoundingClientRect());
+          } else {
+            hideToolbar();
+          }
+        }, 1);
+      });
+
+      if (thePlaceholder) {
+        
+        if (isEmpty()) {
+          placeheld = true;
+          $el.html(getPlaceholder());
+          $el.addClass('placeheld');
+        } else {
+          pushToUndo();
+        }
+
+        $el.focus(function(e) {
+
+        });
+        
+        $el.keydown(function(e) {
+          var charCode = e.keyCode || e.which;
+
+          // don't allow enter key inside heading tags
+          if (charCode === 13 && isHeadingTag) {
+            return false;
+          }
+
+          // ignore CMD + A (select all)
+          if (placeheld && e.metaKey && charCode == 65) {
+            return false;
+          }
+
+          // only clear for alpha numeric
+          if (!charCode || /[^a-z0-9 ]/i.test(String.fromCharCode(charCode))) {
+            return true;
+          }
+
+          if (placeheld) {
+            var range = document.createRange();
+            range.selectNodeContents($el.get(0));
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            placeheld = false;
+            isHeadingTag ? $el.html('') : $el.find('> p').text('');
+            $el.removeClass('placeheld');
+            pushToUndo();
+          }
+        });
+
+        $el.blur(function(e) {
+          if (isEmpty()) {
+            placeheld = true;
+            $el.html(getPlaceholder());
+            $el.addClass('placeheld');
+          } else if (isPlaceholder()) {
+            $el.html(getPlaceholder());
+            $el.addClass('placeheld');
+          }
+        });
+      
+      // If no placeholder, push current content onto undo stack
+      } else { 
+
+        pushToUndo();
+
+      }
+
+    },
+
+    init_tinymce: function() {
 
       this.exec = function(cmd, ui, val, a) {
         this.tinymce.execCommand(cmd, ui, val, a);
@@ -68,6 +520,10 @@
       this.val = function(val) {
         if (val !== undefined) {
           this.tinymce.setContent(val);
+          if (this.$el.attr('placeholder') && ( !val || !val.trim() )) {
+            this.tinymce.setContent(this.$el.attr("placeholder"));
+            $(this.tinymce.getDoc()).find('body').addClass('placeheld');
+          }
           return this;
         } else {
           val = this.tinymce.getContent();
@@ -325,12 +781,14 @@
     clearTimeout(dragActionTimeout);
     $body.addClass('dragging');
   });
+
   $window.on('dragend', function(e) {
     clearTimeout(dragActionTimeout);
     dragActionTimeout = setTimeout(function() {
       $body.removeClass('dragging');
     }, 500);
   });
+
   $window.on('dragleave', function(e) {
     clearTimeout(dragActionTimeout);
     dragActionTimeout = setTimeout(function() {
@@ -352,6 +810,10 @@
   };
 
   $('[data-edit-as]').each(function() {
+    $(this)[ns]();
+  });
+
+  $('[contenteditable="true"]').not('[wysiwyg-ignore="true"]').each(function() {
     $(this)[ns]();
   });
 

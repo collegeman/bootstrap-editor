@@ -36,9 +36,15 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Bootstrap-Editor</a>
+          <a class="brand" href="/bootstrap-editor">Bootstrap-Editor</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="/bootstrap-editor/examples/wysiwyg.html">Examples</a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                  <li><a href="/bootstrap-editor/examples/wysiwyg.html">WYSIWYG</a></li>  
+                </ul>
+              </li>
               <li><a href="http://github.com/collegeman/bootstrap-editor">Github Project</a></li>
               <li><a href="http://fatpandadev.com">Fat Panda</a></li>
             </ul>
@@ -63,6 +69,7 @@
             <li><a href="#files"><i class="icon-chevron-right"></i> Download</a></li>
             <li><a href="#setup"><i class="icon-chevron-right"></i> Setup</a></li>
             <li><a href="#wysiwyg"><i class="icon-chevron-right"></i> WYSIWYG Editor</a></li>
+            <li><a href="#tinymce"><i class="icon-chevron-right"></i> TinyMCE Editor</a></li>
             <li><a href="#markdown"><i class="icon-chevron-right"></i> Markdown Editor</a></li>
             <li><a href="#code"><i class="icon-chevron-right"></i> Code Editor</a></li>
           </ul>
@@ -125,7 +132,7 @@
               <pre class="prettyprint linenums">&lt;link rel="stylesheet" href="/bootstrap-editor/dist/css/font-awesome.min.css"&gt;
 &lt;link rel="stylesheet" href="/bootstrap-editor/dist/css/bootstrap-editor.min.css"&gt;</pre>
               <p>And before the closing <code>&lt;/body&gt;</code> tag and <em>after</em> the bootstrap JavaScripts, add the following:</p>
-              <pre class="prettyprint linenums">&lt;!-- if using the WYSIWYG editor: --&gt;
+              <pre class="prettyprint linenums">&lt;!-- if using the TinyMCE editor: --&gt;
 &lt;script src="/bootstrap-editor/dist/js/tinymce/jscripts/tiny_mce/tiny_mce_dev.js"&gt;&lt;/script&gt;
 &lt;!-- if using upload features: --&gt;
 &lt;script src="/bootstrap-editor/dist/js/plupload/plupload.js"&gt;&lt;/script&gt;
@@ -136,17 +143,31 @@
 
           <section id="wysiwyg">
             <div class="page-header">
-              <h1>WYSIWYG Editor <small>TinyMCE</small></h1>
+              <h1>WYSIWYG Editor <small>HTML5 contenteditable</small></h1>
+            </div>
+
+            <p>Transform any block level element into a WYSIWYG editor.</p>
+
+            <div class="bs-docs-example">
+              <div contenteditable="true" placeholder="This is where you write and style!"></div>
+            </div>
+            <pre class="prettyprint linenums">&lt;div contenteditable="true" placeholder="This is where you write and style!"&gt;&lt;div&gt;</pre>
+            
+          </section>
+
+          <section id="tinymce">
+            <div class="page-header">
+              <h1>TinyMCE Editor</h1>
             </div>
 
             <p>Transform a <code>&lt;textarea&gt;</code> input into a <a href="http://www.tinymce.com/" target="_blank">TinyMCE</a> editor with formatting tools,
               drag-and-drop uploading, and distraction-free mode.</p>
           
             <div class="bs-docs-example">
-              <textarea data-edit-as="wysiwyg" data-tinymce-css="/bootstrap-editor/css/tinymce-content.css" placeholder="This is where you write and style"></textarea>
+              <textarea data-edit-as="tinymce" data-tinymce-css="/bootstrap-editor/css/tinymce-content.css" placeholder="This is where you write and style"></textarea>
             </div>
 
-            <pre class="prettyprint linenums">&lt;textarea data-edit-as="wysiwyg" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
+            <pre class="prettyprint linenums">&lt;textarea data-edit-as="tinymce" placeholder="This is where you write and style!"&gt;&lt;textarea&gt;</pre>
             
             <hr class="bs-docs-separator">
 
