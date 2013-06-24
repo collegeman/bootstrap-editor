@@ -92,6 +92,59 @@
         $body.append($toolbar);
       }
 
+      var undoStack = [], redoStack = [];
+
+      var doUndo = function() {
+        if (undoStack.length) {
+          var last = undoStack.pop();
+          last.exec();
+          redoStack.push(last);
+          if (isEmpty()) {
+            setTimeout(function() {
+              $el.focus();
+            }, 10);
+          } else {
+            moveCaret();
+          }
+        }
+        console.log('undo', undoStack, redoStack);
+      };
+
+      var doRedo = function() {
+        if (redoStack.length) {
+          var last = redoStack.pop();
+          last.exec();
+          undoStack.push(last);
+          if (isEmpty()) {
+            setTimeout(function() {
+              $el.focus();
+            }, 10);
+          } else {
+            moveCaret();
+          }
+        }
+        console.log('redo', undoStack, redoStack);
+      };
+
+      var pushToUndo = function() {
+        redoStack = [];
+        // TODO: consider cloning here instead:
+        var previousVal = $el.html();
+        undoStack.push({
+          __previous__: previousVal.length ? previousVal : false,
+          exec: function() {
+            var currentVal = $el.html();
+            redoStack.push({
+              exec: function() {
+                $el.html(currentVal);
+              }
+            });
+            $el.html(previousVal);
+          }
+        });
+        console.log('pushToUndo', undoStack, redoStack);
+      };
+
       var isEmpty = function() {
         return $('<div>' + $el.html() + '</div>').text().trim().length < 1;
       };
@@ -106,6 +159,23 @@
 
       var isPlaceholder = function() {
         return $('<div>' + $el.html() + '</div>').text().trim() === thePlaceholder;
+      };
+
+      var moveCaret = function(head) {
+        var range,selection;
+        if (document.createRange) { //Firefox, Chrome, Opera, Safari, IE 9+ 
+          range = document.createRange();//Create a range (a range is a like the selection but invisible)
+          range.selectNodeContents(editable);//Select the entire contents of the element with the range
+          range.collapse(head ? true : false);//collapse the range to the end point. false means collapse to end rather than the start
+          selection = window.getSelection();//get the selection object (allows you to change selection)
+          selection.removeAllRanges();//remove any selections already made
+          selection.addRange(range);//make the range you have just created the visible selection
+        } else if(document.selection) { //IE 8 and lower
+          range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
+          range.moveToElementText(editable);//Select the entire contents of the element with the range
+          range.collapse(head ? true : false);//collapse the range to the end point. false means collapse to end rather than the start
+          range.select();//Select the range (make it the visible selection
+        }
       };
 
       this.val = function(val) {
@@ -247,7 +317,7 @@
       };
 
       var onPaste = function(e) {
-        var $textarea = $('<textarea style="position:absolute; left: -1000px;"></textarea>');
+        var $textarea = $('<textarea style="position:absolute; left: -1000px; top: ' + $window.scrollTop() + 'px"></textarea>');
         $body.append($textarea);
         !function() {
           var range = saveSelection();
@@ -255,13 +325,13 @@
           setTimeout(function() {
             var val = $textarea.val();
             $textarea.remove();
-            // restoreSelection(range);
+            restoreSelection(range);
             if (placeheld) {
               placeheld = false;
               isHeadingTag ? $el.html('') : $el.find('> p').text('');
+              // pushToUndo();
               $el.removeClass('placeheld');
               $el.text(val);
-              /*
               if (captureSelection()) {
                 range.selectNodeContents(editable);
                 forceParagraphTagFor($(range.commonAncestorContainer));
@@ -270,8 +340,8 @@
                 selection.removeAllRanges();
                 selection.addRange(range);
               }
-              */
             } else {
+              // pushToUndo();
               insertTextAtCursor(val);
             }
           }, 0);
@@ -279,13 +349,50 @@
       }
 
       $el.keydown(function(e) {
-        var isDelKey = ( e.keyCode || e.which ) === 8;
-        var isSelectAll = e.metaKey && ( e.keyCode || e.which ) === 65;
-        if (that.options.maxLength && !placeheld && !isDelKey && !isSelectAll) {
+        var key = e.keyCode || e.which;
+        var isDelKey = key === 8;
+        var isSelectAll = e.metaKey && key === 65;
+        var isUndo = e.metaKey && key === 90;
+        var isRedo = e.shiftKey && e.metaKey && key === 90;
+        var isIgnored = isDelKey || isSelectAll;
+
+        if (isDelKey) {
+          pushToUndo();
+        }
+
+        if (isIgnored) {
+          return true;
+        }
+
+        if (isRedo) {
+          if (placeheld) {
+            return false;
+          }
+          doRedo();
+          return false;
+        }
+
+        if (isUndo) {
+          if (placeheld) {
+            return false;
+          }
+          doUndo();
+          return false;
+        }
+
+        // If space or enter keys are stroked, push to undo stack
+        if (key === 32 || key === 13) {
+          pushToUndo();
+        }
+
+        // Enforce length limitations
+        if (that.options.maxLength && !placeheld) {
           if ($('<div>' + $el.html() + '</div>').text().length >= that.options.maxLength) {
             return false;
           }
         }
+
+        // Handle onPaste action in Opera and Firefox
         if (isOpera || isFirefox) {
           if (((isMac ? e.metaKey : e.ctrlKey) && e.keyCode == 86) || (e.shiftKey && e.keyCode == 45)) {
             onPaste(e);
@@ -298,12 +405,19 @@
       }
       
       function forceParagraphTagFor($element) {
-        // console.log($element);
+        // container?
+        if ($element.data('editor') === $el.data('editor')) {
+          $el.html('<p>' + $el.text() + '</p>');
+        } else {
+          console.log('no');
+        }
       };
 
       // Recalculate selection while typing
+      var keyUpTimeout;
       $el.keyup(function(e) {
-        setTimeout(function() {
+        clearTimeout(keyUpTimeout);
+        keyUpTimeout = setTimeout(function() {
           if (captureSelection(e) && !selection.isCollapsed && selection.type !== 'Caret') {
             forceParagraphTagFor($(range.commonAncestorContainer));
             showToolbarOn(range.getBoundingClientRect());
@@ -331,12 +445,14 @@
         }, 1);
       });
 
-      if ($el.attr('placeholder')) {
+      if (thePlaceholder) {
         
         if (isEmpty()) {
           placeheld = true;
           $el.html(getPlaceholder());
           $el.addClass('placeheld');
+        } else {
+          pushToUndo();
         }
 
         $el.focus(function(e) {
@@ -362,9 +478,16 @@
           }
 
           if (placeheld) {
+            var range = document.createRange();
+            range.selectNodeContents($el.get(0));
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
             placeheld = false;
             isHeadingTag ? $el.html('') : $el.find('> p').text('');
             $el.removeClass('placeheld');
+            pushToUndo();
           }
         });
 
@@ -379,7 +502,12 @@
           }
         });
       
-      } // end placeholder configuration
+      // If no placeholder, push current content onto undo stack
+      } else { 
+
+        pushToUndo();
+
+      }
 
     },
 
@@ -653,12 +781,14 @@
     clearTimeout(dragActionTimeout);
     $body.addClass('dragging');
   });
+
   $window.on('dragend', function(e) {
     clearTimeout(dragActionTimeout);
     dragActionTimeout = setTimeout(function() {
       $body.removeClass('dragging');
     }, 500);
   });
+
   $window.on('dragleave', function(e) {
     clearTimeout(dragActionTimeout);
     dragActionTimeout = setTimeout(function() {
