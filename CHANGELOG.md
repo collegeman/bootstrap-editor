@@ -1,7 +1,7 @@
-0.3 (Jun 07, 2013)
+0.3 (Jun 24, 2013)
 --------------------
 * Decided to create a WYSIWYG editor based on HTML5's contenteditable attribute
-* What was called the "WYSIWYG" editor is now simply referred to by its implementation, TinyMCE
+* Decided to hide most of the rest of the project for now
 
 0.2 (May 28, 2013)
 --------------------
