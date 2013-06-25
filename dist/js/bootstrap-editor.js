@@ -127,6 +127,7 @@
         $toolbar.find('.inner').css({ 'left': offset + 'px' });
       };
 
+      
       var hideToolbar = function() {
         $toolbar.hide();
       };
@@ -166,16 +167,20 @@
 
 
       CKEDITOR.inline(this.$el.attr('id'), {
-        removePlugins: 'toolbar,link,contextmenu',
+        removePlugins: 'toolbar,link,liststyle,tabletools,contextmenu',
         allowedContent: isHeadingTag ? null : {
           'a': {
-            'attributes': '!href'
+            'attributes': '!href,rel'
           },
           'p': {
             'attributes': 'name'
           },
           'i em strong b': true,
-          'h1 h2': true
+          'h1 h2': true,
+          'ul li': true,
+          'blockquote': {
+            'classes': 'center'
+          }
         }
       });
 
@@ -223,19 +228,24 @@
         }, 1);
       });
 
+      var cancelHideToolbar = false;
+
       $toolbar.find('button').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+        cancelHideToolbar = true;
         return false;
       });
 
-      $('html').mouseup(function(e) {
+      $(document).mouseup(function(e) {
         setTimeout(function() {
           var selection = captureSelection(e);
           if (!placeheld && selection && !selection.isCollapsed && selection.type !== 'Caret') {
             showToolbarOn(selection.getRangeAt(0).getBoundingClientRect());
           } else {
-            hideToolbar();
+            if (!cancelHideToolbar) {
+              hideToolbar();
+            } else {
+              cancelHideToolbar = false;
+            }
           }
         }, 1);
       });
