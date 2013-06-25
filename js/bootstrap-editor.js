@@ -5,6 +5,10 @@
  */
 !function($, ns) {
 
+  'use strict';
+
+  CKEDITOR.disableAutoInline = true;
+  
   var $window = $(window), $body = $('body');
   var d = document, na = navigator, ua = na.userAgent;
   var isOpera = window.opera && opera.buildNumber;
@@ -27,16 +31,21 @@
     init: function(options) {
       var that = this, $el = this.$el;
       
-      var contentEditableType = $el.attr('contenteditable') ? 'wysiwyg' : false;
+      var contentEditableType = $el.attr('contenteditable') ? 'ckeditor' : false;
       this.options = options || {};
       this.options.type = ( this.options.type || $el.data('edit-as') || contentEditableType || defaultEditorType ).toLowerCase();
       this.options.fullscreen = $el.data('fullscreen') !== undefined ? $el.data('fullscreen') : true;
       this.options.width = $el.data('width') || '100%';
       this.options.height = $el.data('height') || '100';
       this.options.maxHeight = $el.data('max-height') || $window.height() * 0.60;
-      
+      this.options.nobreaks = $el.data('nobreaks') || null;
+
       $el.addClass('bootstrap-editor bootstrap-editor-' + this.options.type);
-      $el.addClass(this.classId = 'bootstrap-editor-' + ( ++Editor.elIdx ).toString());
+      this.id = ++Editor.elIdx;
+      $el.addClass(this.classId = 'bootstrap-editor-' + this.id);
+      if (!$el.attr('id')) {
+        $el.attr('id', 'bootstrap-editor-' + this.id);
+      }
 
       $el.on('init', function() {
         if (that.options.width === 'auto' || that.options.width === '100%') {
@@ -55,12 +64,248 @@
       this['init_' + this.options.type](options);
     },
 
-    init_markdown: function() {
+    
+    init_ckeditor: function() {
+      var that = this,
+          $el = this.$el, 
+          editable = $el.get(0),
+          thePlaceholder = $el.attr('placeholder'), 
+          tag = $el.prop('tagName').toLowerCase(),
+          placeheld = false, 
+          editor = false,
+          isHeadingTag = tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6';
 
+      var isEmpty = function() {
+        return $('<div>' + $el.html() + '</div>').text().trim().length < 1;
+      };
+
+      var getPlaceholder = function() {
+        if (!thePlaceholder) {
+          return false;
+        } else {
+          return '<p>' + thePlaceholder + '</p>';
+        }
+      };
+
+      var isPlaceholder = function() {
+        return $('<div>' + $el.html() + '</div>').text().trim() === thePlaceholder;
+      };
+
+      this.val = function(val) {
+        if (val !== undefined) {
+          editor.setData(val);
+          if (thePlaceholder && ( !val || !val.trim() )) {
+            editor.setData(getPlaceholder());
+            this.$el.addClass('placeheld');
+          }
+          return this;
+        } else {
+          val = editor.getData();
+          if (thePlaceholder && $(val).text().trim() === thePlaceholder) {
+            return '';
+          } else {
+            return val;
+          }
+        }
+      };
+
+      var showToolbarOn = function(rect) {
+        var left = ( rect.left + ( rect.width / 2 ) - ( $toolbar.width() / 2 ) ), offset = 0;
+
+        // offset to keep the toolbar on the screen
+        if (left < 0) {
+          offset = ( -1 * left + 15 );
+        } else if (left + $toolbar.width() > $window.width()) {
+          offset = $window.width() - ( left + $toolbar.width() ) - 20;
+        }
+
+        $toolbar.css({ 
+          'top': ( rect.top - $toolbar.height() - 18 ) + 'px',
+          'left': left + 'px' 
+        }).show();
+
+        $toolbar.find('.inner').css({ 'left': offset + 'px' });
+      };
+
+      
+      var hideToolbar = function() {
+        $toolbar.hide();
+      };
+
+      this.options.tools = $el.data('tools') || !isHeadingTag;
+      this.options.maxLength = $el.data('max-length') || false;
+
+      var $toolbar = $('#' + ns + '-wysiwyg-toolbar');
+
+      if (this.options.tools && !$toolbar.length) {
+        var $btnGroup = $('<div class="inner btn-group"></div>');
+        $toolbar = $('<div id="' + ns + '-wysiwyg-toolbar" class="contenteditable btns"></div>');
+        $toolbar.append($btnGroup);
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-bold"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-italic"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H1</button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H2</button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-quote-left"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-link"></i></button>');
+        $body.append($toolbar);
+      }
+
+      if (isHeadingTag || this.options.nobreaks === true) {
+        $el.addClass('nobreaks');
+      }
+
+      if (thePlaceholder) {
+        
+        if (isEmpty()) {
+          placeheld = true;
+          $el.html(getPlaceholder());
+          $el.addClass('placeheld');
+        }
+
+      }
+
+
+
+      CKEDITOR.inline(this.$el.attr('id'), {
+        removePlugins: 'toolbar,link,liststyle,tabletools,contextmenu',
+        allowedContent: isHeadingTag ? null : {
+          'a': {
+            'attributes': '!href,rel'
+          },
+          'p': {
+            'attributes': 'name'
+          },
+          'i em strong b': true,
+          'h1 h2': true,
+          'ul li': true,
+          'blockquote': {
+            'classes': 'center'
+          }
+        }
+      });
+
+      editor = CKEDITOR.instances[this.$el.attr('id')];
+
+      var captureSelection = function(e) {
+        // Don't capture selection outside editable region
+        var isOrContainsAnchor = false,
+          isOrContainsFocus = false,
+          sel = window.getSelection(),
+          parentAnchor = sel.anchorNode,
+          parentFocus = sel.focusNode;
+
+        while (parentAnchor && parentAnchor != document.documentElement) {
+          if (parentAnchor === editable) {
+            isOrContainsAnchor = true;
+          }
+          parentAnchor = parentAnchor.parentNode;
+        }
+
+        while (parentFocus && parentFocus != document.documentElement) {
+          if (parentFocus === editable) {
+            isOrContainsFocus = true;
+          }
+          parentFocus = parentFocus.parentNode;
+        }
+
+        if (!isOrContainsAnchor || !isOrContainsFocus) {
+          return false;
+        }
+
+        return editor.getSelection().getNative();        
+      }
+
+      var keyUpTimeout;
+      $el.keyup(function(e) {
+        clearTimeout(keyUpTimeout);
+        keyUpTimeout = setTimeout(function() {
+          var selection = captureSelection(e);
+          if (selection && !selection.isCollapsed && selection.type !== 'Caret') {
+            showToolbarOn(selection.getRangeAt(0).getBoundingClientRect());
+          } else {
+            hideToolbar();
+          }
+        }, 1);
+      });
+
+      var cancelHideToolbar = false;
+
+      $toolbar.find('button').click(function(e) {
+        cancelHideToolbar = true;
+        return false;
+      });
+
+      $(document).mouseup(function(e) {
+        setTimeout(function() {
+          var selection = captureSelection(e);
+          if (!placeheld && selection && !selection.isCollapsed && selection.type !== 'Caret') {
+            showToolbarOn(selection.getRangeAt(0).getBoundingClientRect());
+          } else {
+            if (!cancelHideToolbar) {
+              hideToolbar();
+            } else {
+              cancelHideToolbar = false;
+            }
+          }
+        }, 1);
+      });
+      
+      editor.on('key', function(e) {
+        var key = e.data.keyCode;
+
+        if (key === 9 || key === 2228233) {
+          return true;
+        }
+
+        if (placeheld && /[^a-z0-9 ]/i.test(String.fromCharCode(key))) {
+          return false;
+        }
+
+        if (key === 13 && ( that.options.nobreaks === true || ( that.options.nobreaks === null && isHeadingTag ) )) {
+          return false;
+        }
+
+        if (placeheld) {
+          placeheld = false;
+          $el.removeClass('placeheld');
+          
+          if (editable.hasChildNodes() && document.createRange && window.getSelection) {
+            $el.empty();
+            var range, sel;
+            range = document.createRange();
+            range.selectNodeContents(this);
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      });
+
+      $el.mousedown(function(e) {
+        if (placeheld) {
+          // keeps cursor at the head
+          $el.focus();
+          return false;
+        }
+      });
+
+      $el.blur(function(e) {
+        if (isEmpty()) {
+          placeheld = true;
+          $el.html(getPlaceholder());
+          $el.addClass('placeheld');
+        } else if (isPlaceholder()) {
+          $el.html(getPlaceholder());
+          $el.addClass('placeheld');
+        }
+      });
+    
+    },  
+
+    init_markdown: function() {
     },
 
     init_source: function() {
-
     },
 
     init_wysiwyg: function() {
@@ -508,7 +753,6 @@
         pushToUndo();
 
       }
-
     },
 
     init_tinymce: function() {

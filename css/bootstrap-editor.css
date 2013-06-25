@@ -42,5 +42,5 @@ body.dragging .bootstrap-mce-editor .dropzone, .bootstrap-mce-editor.receiving .
 .contenteditable.btns { display: none; position: absolute; width: 340px; border-radius: 4px; }
 .contenteditable.btns:after { top: 100%; border: solid transparent; content: " "; height: 0; width: 0; position: absolute; pointer-events: none; }
 .contenteditable.btns:after { border-color: rgba(11, 15, 18, 0); border-top-color: #0b0f12; border-width: 10px; left: 50%; margin-left: -10px; }
-.bootstrap-editor-wysiwyg.placeheld > p { color: #bbb; }
-.bootstrap-editor-wysiwyg { outline: none; }
+.bootstrap-editor-ckeditor.placeheld > p, .bootstrap-editor-ckeditor.nobreaks.placeheld { color: #bbb; }
+.bootstrap-editor-ckeditor { outline: none; }
