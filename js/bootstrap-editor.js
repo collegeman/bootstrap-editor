@@ -186,35 +186,6 @@
 
       editor = CKEDITOR.instances[this.$el.attr('id')];
 
-      var captureSelection = function(e) {
-        // Don't capture selection outside editable region
-        var isOrContainsAnchor = false,
-          isOrContainsFocus = false,
-          sel = window.getSelection(),
-          parentAnchor = sel.anchorNode,
-          parentFocus = sel.focusNode;
-
-        while (parentAnchor && parentAnchor != document.documentElement) {
-          if (parentAnchor === editable) {
-            isOrContainsAnchor = true;
-          }
-          parentAnchor = parentAnchor.parentNode;
-        }
-
-        while (parentFocus && parentFocus != document.documentElement) {
-          if (parentFocus === editable) {
-            isOrContainsFocus = true;
-          }
-          parentFocus = parentFocus.parentNode;
-        }
-
-        if (!isOrContainsAnchor || !isOrContainsFocus) {
-          return false;
-        }
-
-        return editor.getSelection().getNative();        
-      }
-
       var keyUpTimeout;
       $el.keyup(function(e) {
         clearTimeout(keyUpTimeout);
@@ -250,6 +221,8 @@
         }, 1);
       });
       
+      // This handler is 100% for processing placeholder removal
+      // Use $el.on('keydown') below for content processing
       editor.on('key', function(e) {
         var key = e.data.keyCode;
 
@@ -267,10 +240,14 @@
 
         if (placeheld) {
           placeheld = false;
-          $el.removeClass('placeheld');
-          
+          $el.empty().removeClass('placeheld');
+          var range = editor.createRange(), selection = editor.getSelection();
+          range.selectNodeContents(editor.document.getBody());
+          selection.removeAllRanges();
+          selection.selectRanges(range);
+          /*
+          // TODO: make sure this is cross-platform
           if (editable.hasChildNodes() && document.createRange && window.getSelection) {
-            $el.empty();
             var range, sel;
             range = document.createRange();
             range.selectNodeContents(this);
@@ -278,8 +255,11 @@
             sel.removeAllRanges();
             sel.addRange(range);
           }
+          */
         }
       });
+
+      
 
       $el.mousedown(function(e) {
         if (placeheld) {
