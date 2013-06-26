@@ -186,13 +186,28 @@
 
       editor = CKEDITOR.instances[this.$el.attr('id')];
 
+      this.getRange = function() {
+        var sel = editor.getSelection().getNative();
+        if (sel === null) {
+          return false;
+        }
+        if (sel.getRangeAt) {
+          return sel.getRangeAt(0);
+        } else { // Safari!
+          var range = document.createRange();
+          range.setStart(sel.anchorNode, sel.anchorOffset);
+          range.setEnd(sel.focusNode, sel.focusOffset);
+          return range;
+        }
+      };
+
       var keyUpTimeout;
       $el.keyup(function(e) {
         clearTimeout(keyUpTimeout);
         keyUpTimeout = setTimeout(function() {
-          var selection = captureSelection(e);
-          if (selection && !selection.isCollapsed && selection.type !== 'Caret') {
-            showToolbarOn(selection.getRangeAt(0).getBoundingClientRect());
+          var range = that.getRange();
+          if (range && !range.collapsed) {
+            showToolbarOn(range.getBoundingClientRect());
           } else {
             hideToolbar();
           }
@@ -208,9 +223,9 @@
 
       $(document).mouseup(function(e) {
         setTimeout(function() {
-          var selection = captureSelection(e);
-          if (!placeheld && selection && !selection.isCollapsed && selection.type !== 'Caret') {
-            showToolbarOn(selection.getRangeAt(0).getBoundingClientRect());
+          var range = that.getRange();
+          if (!placeheld && range && !range.collapsed) {
+            showToolbarOn(range.getBoundingClientRect());
           } else {
             if (!cancelHideToolbar) {
               hideToolbar();
