@@ -2,4 +2,5 @@
 .editor header h1 { font-size: 52px; line-height: 1; margin-bottom: -10px; }
 .editor header h2 { margin: 20px 0; font-size: 27px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: normal; font-style: italic; }
 .editor .content { line-height: 29px; font-size: 20px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: normal; }
-.editor .content p { margin-bottom: 15px; }
+.editor .content li { margin-bottom: 15px; }
+.editor .content p, .editor .content ul, .editor .content ol { margin-bottom: 20px; }
