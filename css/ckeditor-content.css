@@ -1,6 +1,24 @@
-.editor { margin-top: 100px; }
+.editor { margin-top: 20px; }
+.btn-toolbar { margin-bottom: 20px; }
 .editor header h1 { font-size: 52px; line-height: 1; margin-bottom: -10px; }
 .editor header h2 { margin: 20px 0; font-size: 27px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: normal; font-style: italic; }
 .editor .content { line-height: 29px; font-size: 20px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: normal; }
-.editor .content li { margin-bottom: 15px; }
+.editor .content h2, .editor .content h3 { margin: 0 0 5px 0; font-size: 26px; line-height: 1.2; font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+.editor .content h2 { padding-top: 25px; font-size: 32px; line-height: 1.2; }
+.editor .content li { margin-bottom: 10px; line-height: 29px; }
 .editor .content p, .editor .content ul, .editor .content ol { margin-bottom: 20px; }
+.editor .content blockquote.pullquote { border: none; text-align: center; font-size: 32px; font-style: italic; line-height: 1.4; margin: 48px -100px; }
+
+@media (min-width: 1280px) {
+  .btn-toolbar { text-align: right; }
+  .editor { margin-top: 50px; }
+}
+
+@media (max-width: 500px) {
+  .editor { margin-top: 25px; }
+  .editor header h1 { font-size: 32px; line-height: 1.4;  }
+  .editor header h2 { font-size: 20px; line-height: 1.2; margin-top: 10px; }
+  .editor .content { line-height: 1.4; font-size: 18px; }
+  .editor .content p, .editor .content ul, .editor .content ol { margin-bottom: 15px; }
+  .editor .content li { line-height: 1.4; }
+}

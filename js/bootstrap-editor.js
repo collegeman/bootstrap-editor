@@ -24,6 +24,21 @@
     this.init(options);
   };
 
+  var ckAllowedContent = {
+    'a': {
+      'attributes': '!href,rel'
+    },
+    'p': {
+      'attributes': 'name'
+    },
+    'i em strong b': true,
+    'h1 h2 h3': true,
+    'ul ol li': true,
+    'blockquote': {
+      'attributes': 'class'
+    }
+  };
+  
   Editor.elIdx = 0;
 
   Editor.prototype = {
@@ -109,7 +124,8 @@
         }
       };
 
-      var showToolbarOn = function(rect) {
+      var showToolbarOn = function(range) {
+        var rect = range.getBoundingClientRect();
         var left = ( rect.left + ( rect.width / 2 ) - ( $toolbar.width() / 2 ) ), offset = 0;
 
         // offset to keep the toolbar on the screen
@@ -140,13 +156,13 @@
       if (this.options.tools && !$toolbar.length) {
         var $btnGroup = $('<div class="inner btn-group"></div>');
         $toolbar = $('<div id="' + ns + '-wysiwyg-toolbar" class="contenteditable btns"></div>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse" data-cmd="b"><i class="icon-white icon-bold"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse" data-cmd="i"><i class="icon-white icon-italic"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1" data-cmd="h2">H1</button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1" data-cmd="h3">H2</button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse" data-cmd="blockquote"><i class="icon-white icon-quote-left"></i></button>');
+        $btnGroup.append('<button class="btn btn-large btn-inverse" data-cmd="a"><i class="icon-white icon-link"></i></button>');
         $toolbar.append($btnGroup);
-        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-bold"></i></button>');
-        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-italic"></i></button>');
-        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H1</button>');
-        $btnGroup.append('<button class="btn btn-large btn-inverse btn-h1">H2</button>');
-        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-quote-left"></i></button>');
-        $btnGroup.append('<button class="btn btn-large btn-inverse"><i class="icon-white icon-link"></i></button>');
         $body.append($toolbar);
       }
 
@@ -155,44 +171,32 @@
       }
 
       if (thePlaceholder) {
-        
         if (isEmpty()) {
           placeheld = true;
           $el.html(getPlaceholder());
           $el.addClass('placeheld');
         }
-
       }
 
-
-
       CKEDITOR.inline(this.$el.attr('id'), {
-        removePlugins: 'toolbar,link,liststyle,tabletools,contextmenu',
-        allowedContent: isHeadingTag ? null : {
-          'a': {
-            'attributes': '!href,rel'
-          },
-          'p': {
-            'attributes': 'name'
-          },
-          'i em strong b': true,
-          'h1 h2': true,
-          'ul li': true,
-          'blockquote': {
-            'classes': 'center'
-          }
-        }
+        removePlugins: 'toolbar,link,liststyle,tabletools,contextmenu,magicline',
+        allowedContent: isHeadingTag ? null : ckAllowedContent
       });
 
       editor = CKEDITOR.instances[this.$el.attr('id')];
 
-      this.getRange = function() {
-        var sel = editor.getSelection().getNative();
+      this.getNativeRange = function() {
+        var sel = editor.getSelection();
+        if (!sel) {
+          return false;
+        }
+        sel = sel.getNative();
         if (sel === null) {
           return false;
         }
         if (sel.getRangeAt) {
-          return sel.getRangeAt(0);
+          var range = sel.getRangeAt(0);
+          return range;
         } else { // Safari!
           var range = document.createRange();
           range.setStart(sel.anchorNode, sel.anchorOffset);
@@ -205,9 +209,9 @@
       $el.keyup(function(e) {
         clearTimeout(keyUpTimeout);
         keyUpTimeout = setTimeout(function() {
-          var range = that.getRange();
+          var range = that.getNativeRange();
           if (range && !range.collapsed) {
-            showToolbarOn(range.getBoundingClientRect());
+            showToolbarOn(range);
           } else {
             hideToolbar();
           }
@@ -216,16 +220,83 @@
 
       var cancelHideToolbar = false;
 
+      var styles = {
+        'b': new CKEDITOR.style({ element: 'strong' }),
+        'i': new CKEDITOR.style({ element: 'em' }),
+        'p': new CKEDITOR.style({ element: 'p' }),
+        'h2': new CKEDITOR.style({ element: 'h2' }),
+        'h3': new CKEDITOR.style({ element: 'h3' }),
+        'li': new CKEDITOR.style({ element: 'li' }),
+        'blockquote': new CKEDITOR.style({ element: 'blockquote' })
+      };
+
       $toolbar.find('button').click(function(e) {
         cancelHideToolbar = true;
+        editor.focus();
+        var $btn = $(this), cmd = $btn.data('cmd'), path = editor.elementPath();
+
+        editor.fire('saveSnapshot');
+
+        // heading tags:
+        if (cmd === 'h2' || cmd === 'h3') {
+          if (styles['blockquote'].checkActive(path) || styles['li'].checkActive(path)) {
+            return false;
+          }
+
+          if (styles[cmd].checkActive(path)) {
+            editor.removeStyle(styles[cmd]);
+            editor.applyStyle(styles['p']);
+          } else {
+            editor.applyStyle(styles[cmd]);
+          }
+
+        // blockquote tag:
+        } else if (cmd === 'blockquote') {
+          var path = editor.elementPath();
+          if (path.block.$.nodeName !== 'BLOCKQUOTE') {
+            if (styles['li'].checkActive(path)) {
+              return false;
+            }
+
+
+            var selection = editor.getSelection(), bookmarks = selection.createBookmarks();
+            editor.execCommand('blockquote');
+            var newPath = editor.elementPath(), $content = $(newPath.block.$), $blockquote = $content.parent();
+            $content.children().unwrap();
+            selection.selectBookmarks(bookmarks);
+          } else {
+            var selection = editor.getSelection(), bookmarks = selection.createBookmarks(), path = editor.elementPath(), $blockquote = $(path.block.$);
+            if (!$blockquote.hasClass('pullquote')) {
+              $blockquote.addClass('pullquote');
+            } else {
+              var $replacement = $('<p></p>').append($blockquote.clone().get(0).childNodes);
+              $blockquote.replaceWith($replacement);
+              hideToolbar();
+            }
+          }
+
+
+        // emphasis and strong:
+        } else if (cmd === 'i' || cmd === 'b') {
+          // no strong tag inside heading tags:
+          if (cmd === 'b' && ( styles['h2'].checkActive(path) || styles['h3'].checkActive(path) )) {
+            return false;
+          }
+          editor[styles[cmd].checkActive(path) ? 'removeStyle' : 'applyStyle'](styles[cmd]);
+        }
+
+        setTimeout(function() {
+          editor.fire('saveSnapshot');
+        }, 0);
+
         return false;
       });
 
       $(document).mouseup(function(e) {
         setTimeout(function() {
-          var range = that.getRange();
+          var range = that.getNativeRange();
           if (!placeheld && range && !range.collapsed) {
-            showToolbarOn(range.getBoundingClientRect());
+            showToolbarOn(range);
           } else {
             if (!cancelHideToolbar) {
               hideToolbar();
@@ -236,8 +307,6 @@
         }, 1);
       });
       
-      // This handler is 100% for processing placeholder removal
-      // Use $el.on('keydown') below for content processing
       editor.on('key', function(e) {
         var key = e.data.keyCode;
 
@@ -260,18 +329,7 @@
           range.selectNodeContents(editor.document.getBody());
           selection.removeAllRanges();
           selection.selectRanges(range);
-          /*
-          // TODO: make sure this is cross-platform
-          if (editable.hasChildNodes() && document.createRange && window.getSelection) {
-            var range, sel;
-            range = document.createRange();
-            range.selectNodeContents(this);
-            sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-          */
-        }
+        } 
       });
 
       
