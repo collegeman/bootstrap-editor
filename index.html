@@ -9,11 +9,6 @@
 
     <!-- Le styles -->
     <link href="/bootstrap-editor/css/bootstrap.css" rel="stylesheet">
-    <style>
-      body {
-        padding-top: 60px;
-      }
-    </style>
     <link href="/bootstrap-editor/css/font-awesome.css" rel="stylesheet"> 
     <link href="/bootstrap-editor/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/bootstrap-editor/css/bootstrap-editor.css" rel="stylesheet">
@@ -28,31 +23,26 @@
 
   <body data-spy="scroll" data-target=".bs-docs-sidebar">
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="/bootstrap-editor">Bootstrap-Editor</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li><a href="http://github.com/collegeman/bootstrap-editor">Github Project</a></li>
-              <li><a href="http://fatpandadev.com">Fat Panda</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
 
     <div class="container">
 
       <div class="row">
         <div class="span8 offset2 editor">
+          <div class="btn-toolbar">
+            <div class="btn-group">
+              <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-download"></i> Download
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" style="text-align:left;">
+                <li><a href="#">Stable</a></li>
+                <li><a href="https://github.com/collegeman/bootstrap-editor/archive/master.zip">Bleeding Edge</a></li>
+              </ul>
+            </div>
+            <a class="btn" href="https://github.com/collegeman/bootstrap-editor"><i class="icon-github"></i> Fork on GitHub</a>
+          </div>
           <header>
-            <h1 contenteditable="true" placeholder="Type your title" data-max-length="100">I want this editor</h1>
+            <h1 contenteditable="true" placeholder="Type your title" data-max-length="100">bootstrap-editor</h1>
             <h2 contenteditable="true" placeholder="Type your subtitle (optional)">Simple, versatile, remarkable, and free.</h1>
           </header>
           <div class="content">
@@ -63,10 +53,11 @@
                 <a href="http://twitter.github.io/bootstrap" target="_blank">Bootstrap</a>,
                 and <a href="http://fontawesome.com" target="_blank">Font Awesome</a>, this
                 library is my homage to their combined blood, sweat, and tears.</p>
-              <p>Suprise! This document is editable. This is my editor:</p>
+              <p>This page is editable, and this is my editor:</p>
               <ul>
-                <li>Inline editing, built on <a href="http://ckeditor.com" target="_blank">CKEditor</a></li>
-                <li>Custom, simplified toolbar that appears when text is selected</li>
+                <li>Inline, distraction free editing built on <a href="http://ckeditor.com" target="_blank">CKEditor</a></li>
+                <li>Minimalistic toolbar that appears only when text is selected</li>
+                <li>A simplified, pluggable event model</li>
               </ul>
               <p>This is a work in progress. You can contribute by working on the <a href="https://github.com/collegeman/bootstrap-editor/issues?state=open">issues</a>.</p>
             </div>
@@ -79,18 +70,22 @@
 
     <footer class="footer">
       <div class="container">
-        <p>The talents and gifts of many, combined by <a href="http://aaroncollegeman.com" target="_blank">@collegeman</a>.</p>
-        <p>Code licensed under <a href="http://opensource.org/licenses/MIT" target="_blank">MIT License</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <!-- <p>Plupload licensed under <a href="http://www.plupload.com/license.php" target="_blank">GPLv2</a>, with <a href="http://www.plupload.com/commercial.php" target="_blank">commercial licenses available</a>.</p> -->
-        <p>CKEditor licensed under <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GPL</a>, <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>, and <a href="http://www.mozilla.org/MPL">MPL</a> with <a href="http://cksource.com/ckeditor" target="_blank">commercial licenses available</a>.</p>
-        <p>Font Awesome is just <a href="http://fortawesome.github.io/Font-Awesome/" target="_blank">awesome</a>.</p>
-        <ul class="footer-links">
-          <li><a href="http://fatpandadev.com">Fat Panda</a></li>
-          <li class="muted">·</li>
-          <li><a href="https://github.com/collegeman/bootstrap-editor/issues?state=open">Issues</a></li>
-          <li class="muted">·</li>
-          <li><a href="https://github.com/collegeman/bootstrap-editor/blob/master/CHANGELOG.md">Changelog</a></li>
-        </ul>
+        <div class="row">
+          <div class="span8 offset2">
+            <p>The talents and gifts of many, combined by <a href="http://aaroncollegeman.com" target="_blank">@collegeman</a>.</p>
+            <p>Code licensed under <a href="http://opensource.org/licenses/MIT" target="_blank">MIT License</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+            <!-- <p>Plupload licensed under <a href="http://www.plupload.com/license.php" target="_blank">GPLv2</a>, with <a href="http://www.plupload.com/commercial.php" target="_blank">commercial licenses available</a>.</p> -->
+            <p>CKEditor licensed under <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GPL</a>, <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>, and <a href="http://www.mozilla.org/MPL">MPL</a> with <a href="http://cksource.com/ckeditor" target="_blank">commercial licenses available</a>.</p>
+            <p>Font Awesome is just <a href="http://fortawesome.github.io/Font-Awesome/" target="_blank">awesome</a>.</p>
+            <ul class="footer-links">
+              <li><a href="http://fatpandadev.com">Fat Panda</a></li>
+              <li class="muted">·</li>
+              <li><a href="https://github.com/collegeman/bootstrap-editor/issues?state=open">Issues</a></li>
+              <li class="muted">·</li>
+              <li><a href="https://github.com/collegeman/bootstrap-editor/blob/master/CHANGELOG.md">Changelog</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </footer>
 
