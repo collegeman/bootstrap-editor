@@ -257,8 +257,6 @@
             if (styles['li'].checkActive(path)) {
               return false;
             }
-
-
             var selection = editor.getSelection(), bookmarks = selection.createBookmarks();
             editor.execCommand('blockquote');
             var newPath = editor.elementPath(), $content = $(newPath.block.$), $blockquote = $content.parent();
@@ -269,9 +267,9 @@
             if (!$blockquote.hasClass('pullquote')) {
               $blockquote.addClass('pullquote');
             } else {
-              var $replacement = $('<p></p>').append($blockquote.clone().get(0).childNodes);
-              $blockquote.replaceWith($replacement);
-              hideToolbar();
+              selection.selectElement(new CKEDITOR.dom.node($blockquote.get(0)));
+              selection.getRanges()[0].insertNode( editor.document.createElement('p') );
+              selection.selectBookmarks(bookmarks);
             }
           }
 
